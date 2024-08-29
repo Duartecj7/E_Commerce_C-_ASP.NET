@@ -1,0 +1,33 @@
+﻿@model E_Commerce_C__ASP.NET.Models.TiposProduto
+@{
+    ViewData["Tittle"] = "Editar";
+}
+<br />
+
+<h2 class="text-info">Editar: @Model.TipoProduto</h2>
+<form asp-action="Edit" method="post">
+    <div class="p-4 rounded border">
+        <input type="hidden" asp-for="Id"/>
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="TipoProduto"></label>
+            </div>
+            <div class="col-5">
+                <input asp-for="TipoProduto" class="form-control" />
+            </div>
+            <span asp-validation-for="TipoProduto" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Editar" />
+            <a asp-action="Index" class="btn btn-success">Voltar à Lista</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync(partialViewName: "_ValidationScriptsPartial");
+    }
+}

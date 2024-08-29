@@ -1,0 +1,37 @@
+﻿@using E_Commerce_C__ASP.NET.Models
+@model IEnumerable<TiposProduto>
+
+@{
+    ViewData["Tittle"] = "Index";
+}
+
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info">Lista de Tipos de Produto </h2>
+    </div>
+    <div class="col-6 d-flex justify-content-end">
+        <a asp-action="Create" class="btn btn-info">&nbsp;Novo Tipo de Produto</a>
+    </div>
+</div>
+<br/>
+<div>
+    <table class="table table-striped border">
+        <tr class="table-info">
+            <th>
+                @Html.DisplayNameFor(expression: c=>c.TipoProduto)
+            </th>
+            <th/>
+            <th/>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TipoProduto</td>
+                <td>
+                    <partial name="_ButtonPartial" model="@item.Id"/>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
