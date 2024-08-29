@@ -1,40 +1,39 @@
 ﻿using E_Commerce_C__ASP.NET.Data;
 using E_Commerce_C__ASP.NET.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class TiposProdutoController : Controller
+    public class SpecialTagController : Controller
     {
         ApplicationDbContext _context;
-        public TiposProdutoController(ApplicationDbContext context)
+        public SpecialTagController(ApplicationDbContext context)
         {
             _context = context;
         }
         public IActionResult Index()
         {
-            var dados = _context.DbSet_TiposProduto.ToList();
+            var dados = _context.DbSet_Tags.ToList();
             return View(dados);
         }
 
-        public IActionResult Create() 
+        public IActionResult Create()
         {
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TiposProduto tiposProduto)
+        public async Task<IActionResult> Create(SpecialTag tag)
         {
             if (ModelState.IsValid)
             {
-                _context.DbSet_TiposProduto.Add(tiposProduto);
+                _context.DbSet_Tags.Add(tag);
                 await _context.SaveChangesAsync();
-                TempData["save"] = "Tipo de produto foi guardado com sucesso!";
+                TempData["save"] = "A Tag foi guardada com sucesso!";
                 return RedirectToAction("Index");
             }
-            return View(tiposProduto);
+            return View(tag);
         }
 
         public IActionResult Edit(int? id)
@@ -42,25 +41,25 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
             if (id == null)
                 return NotFound();
 
-            var tipoProduto = _context.DbSet_TiposProduto.Find(id);
-            if(tipoProduto==null)
+            var tag = _context.DbSet_Tags.Find(id);
+            if (tag == null)
                 return NotFound();
 
-            return View(tipoProduto);
+            return View(tag);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TiposProduto tiposProduto)
+        public async Task<IActionResult> Edit(SpecialTag tag)
         {
             if (ModelState.IsValid)
             {
-                _context.Update(tiposProduto);
+                _context.Update(tag);
                 await _context.SaveChangesAsync();
-                TempData["edit"] = "Tipo de produto foi editado com sucesso!";
+                TempData["edit"] = "A Tag foi editada com sucesso!";
                 return RedirectToAction("Index");
             }
-            return View(tiposProduto);
+            return View(tag);
         }
 
 
@@ -69,11 +68,11 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
             if (id == null)
                 return NotFound();
 
-            var tipoProduto = _context.DbSet_TiposProduto.Find(id);
-            if (tipoProduto == null)
+            var tag = _context.DbSet_Tags.Find(id);
+            if (tag == null)
                 return NotFound();
 
-            return View(tipoProduto);
+            return View(tag);
         }
 
         [HttpPost]
@@ -81,7 +80,7 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
         public IActionResult Details(TiposProduto tiposProduto)
         {
             return RedirectToAction(nameof(Index));
-          
+
         }
 
         public IActionResult Delete(int? id)
@@ -89,35 +88,35 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
             if (id == null)
                 return NotFound();
 
-            var tipoProduto = _context.DbSet_TiposProduto.Find(id);
-            if (tipoProduto == null)
+            var tag = _context.DbSet_Tags.Find(id);
+            if (tag == null)
                 return NotFound();
 
-            return View(tipoProduto);
+            return View(tag);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int? id,TiposProduto tiposProduto)
+        public async Task<IActionResult> Delete(int? id, SpecialTag tag)
         {
-            if(id==null)
+            if (id == null)
                 return NotFound();
 
-            if(id!= tiposProduto.Id)
+            if (id != tag.Id)
                 return NotFound();
 
-            var tipoProduto = _context.DbSet_TiposProduto.Find(id);
-            if (tiposProduto == null)
+            var _tag = _context.DbSet_Tags.Find(id);
+            if (_tag == null)
                 return NotFound();
 
             if (ModelState.IsValid)
             {
-                _context.Remove(tipoProduto);
+                _context.Remove(_tag);
                 await _context.SaveChangesAsync();
-                TempData["delete"] = "Tipo de produto foi eliminado com sucesso!";
+                TempData["delete"] = "A Tag foi eliminada com sucesso!";
                 return RedirectToAction("Index");
             }
-            return View(tiposProduto);
+            return View(tag);
         }
 
     }

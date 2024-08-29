@@ -4,6 +4,7 @@ using E_Commerce_C__ASP.NET.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Commerce_C__ASP.NET.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240829100841_ModelTag")]
+    partial class ModelTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,48 +25,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.Produto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Cor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Disponivel")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Imagem")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Preco")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TipoProdutoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("TipoProdutoId");
-
-                    b.ToTable("DbSet_Produto");
-                });
-
-            modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.SpecialTag", b =>
+            modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -299,25 +261,6 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.Produto", b =>
-                {
-                    b.HasOne("E_Commerce_C__ASP.NET.Models.SpecialTag", "TagNome")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("E_Commerce_C__ASP.NET.Models.TiposProduto", "TipoProduto")
-                        .WithMany()
-                        .HasForeignKey("TipoProdutoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TagNome");
-
-                    b.Navigation("TipoProduto");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

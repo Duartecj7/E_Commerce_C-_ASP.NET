@@ -1,5 +1,5 @@
 ﻿@using E_Commerce_C__ASP.NET.Models
-@model IEnumerable<TiposProduto>
+@model IEnumerable<SpecialTag>
 
 @{
     ViewData["Tittle"] = "Index";
@@ -7,52 +7,57 @@
 
 <div class="row">
     <div class="col-6">
-        <h2 class="text-info">Lista de Tipos de Produto </h2>
-    </div>
-    <div class="col-6 d-flex justify-content-end">
-        <a asp-action="Create" class="btn btn-info">&nbsp;Novo Tipo de Produto</a>
+        <h2>Lista de Tags</h2>
     </div>
 </div>
-<br/>
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info">Lista de Tags</h2>
+    </div>
+    <div class="col-6 d-flex justify-content-end">
+        <a asp-action="Create" class="btn btn-info">&nbsp;Nova Tag</a>
+    </div>
+</div>
+<br />
 <div>
     <table class="table table-striped border">
         <tr class="table-info">
             <th>
-                @Html.DisplayNameFor(expression: c=>c.TipoProduto)
+                @Html.DisplayNameFor(expression: c => c.TagNome)
             </th>
-            <th/>
-            <th/>
+            <th />
+            <th />
         </tr>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.TipoProduto</td>
+                <td>@item.TagNome</td>
                 <td>
-                    <partial name="_ButtonPartial" model="@item.Id"/>
+                    <partial name="_ButtonPartial" model="@item.Id" />
                 </td>
             </tr>
         }
     </table>
 </div>
+
 @section scripts {
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
     <script type="text/javascript">
         $(function () {
             var save = '@TempData["save"]';
-            if (save) {  
+            if (save) {
                 alertify.success(save);
             }
 
             var edit = '@TempData["edit"]';
-            if (edit) {  
+            if (edit) {
                 alertify.success(edit);
             }
 
             var del = '@TempData["delete"]';
-            if (del) {  
+            if (del) {
                 alertify.error(del);
             }
         });
     </script>
 }
-
