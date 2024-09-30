@@ -1,0 +1,109 @@
+﻿@model E_Commerce_C__ASP.NET.Models.Produto
+@{
+    ViewData["Title"] = "Eliminar";
+}
+<br />
+
+<h2 class="text-info">Eliminar Produto</h2>
+<form asp-action="Delete" method="post" enctype="multipart/form-data">
+    <div class="p-4 rounded border row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!-- Coluna para os campos de dados, ocupa 2/5 do espaço -->
+        <div class="col-4">
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="Nome"></label>
+                </div>
+                <div class="col-8">
+                    <input type="hidden" asp-for="Id" />
+                    <input asp-for="Nome" readonly="readonly" class="form-control" />
+                </div>
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="Preco"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="Preco" readonly="readonly" class="form-control" />
+                </div>
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="Imagem"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="Imagem" readonly="readonly" class="form-control" type="file" />
+                </div>
+                <span asp-validation-for="Imagem" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="Cor"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="Cor" readonly="readonly" class="form-control" />
+                </div>
+                <span asp-validation-for="Cor" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="TipoProdutoId"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="TipoProdutoId" readonly="readonly" class="form-control" />
+                </div>
+                <span asp-validation-for="TipoProdutoId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="TagId"></label>
+                </div>
+                <div class="col-8">
+                    <input asp-for="TagId" readonly="readonly" class="form-control" />
+                </div>
+                <span asp-validation-for="TagId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-4">
+                    <label asp-for="Disponivel"></label>
+                </div>
+                <div class="col-8">
+                    @if (Model.Disponivel)
+                    {
+                        <span>Disponível</span>
+                    }
+                    else
+                    {
+                        <span>Não Disponível</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna para a imagem, ocupa 3/5 do espaço -->
+        <div class="col-8 text-center">
+            <img src="~/@Model.Imagem" class="img-fluid" alt="Imagem do Produto" />
+        </div>
+    </div>
+
+    <div class="form-group mt-3">
+        <h3>Quer eliminar este produto?</h3>
+        <input type="submit" asp-controller="Produto" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger" value="Eliminar" />
+        <a asp-action="Index" class="btn btn-success">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

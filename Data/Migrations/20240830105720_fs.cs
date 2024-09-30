@@ -5,7 +5,7 @@
 namespace E_Commerce_C__ASP.NET.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ModelProduto : Migration
+    public partial class fs : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Preco = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Imagem = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Imagem = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Cor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Disponivel = table.Column<bool>(type: "bit", nullable: false),
                     TipoProdutoId = table.Column<int>(type: "int", nullable: false),

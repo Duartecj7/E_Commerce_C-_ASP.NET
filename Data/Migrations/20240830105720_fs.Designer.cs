@@ -4,6 +4,7 @@ using E_Commerce_C__ASP.NET.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Commerce_C__ASP.NET.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240830105720_fs")]
+    partial class fs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,8 +47,8 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Preco")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Preco")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
@@ -302,7 +305,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
 
             modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.Produto", b =>
                 {
-                    b.HasOne("E_Commerce_C__ASP.NET.Models.SpecialTag", "Tag")
+                    b.HasOne("E_Commerce_C__ASP.NET.Models.SpecialTag", "TagNome")
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -314,7 +317,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Tag");
+                    b.Navigation("TagNome");
 
                     b.Navigation("TipoProduto");
                 });

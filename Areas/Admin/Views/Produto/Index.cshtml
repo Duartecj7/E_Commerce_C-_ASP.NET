@@ -1,5 +1,5 @@
 ﻿@using E_Commerce_C__ASP.NET.Models
-@model IEnumerable<SpecialTag>
+@model IEnumerable<Produto>
 
 @{
     ViewData["Tittle"] = "Index";
@@ -7,10 +7,10 @@
 
 <div class="row">
     <div class="col-6">
-        <h2 class="text-info">Lista de Tags</h2>
+        <h2 class="text-info">Lista de Produtos </h2>
     </div>
     <div class="col-6 d-flex justify-content-end">
-        <a asp-action="Create" class="btn btn-info">&nbsp;Nova Tag</a>
+        <a asp-action="Create" class="btn btn-info">&nbsp;Novo Produto</a>
     </div>
 </div>
 <br />
@@ -18,7 +18,22 @@
     <table class="table table-striped border">
         <tr class="table-info">
             <th>
-                @Html.DisplayNameFor(expression: c => c.TagNome)
+                @Html.DisplayNameFor(p => p.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(p => p.Preco)
+            </th>
+            <th>
+                @Html.DisplayNameFor(p => p.Cor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(p => p.Disponivel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(p => p.TipoProduto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(p => p.Tag)
             </th>
             <th />
             <th />
@@ -26,7 +41,12 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.TagNome</td>
+                <td>@item.Nome</td>
+                <td>@item.Preco</td>
+                <td>@item.Cor</td>
+                <td>@item.Disponivel</td>
+                <td>@item.TipoProduto.TipoProduto</td>
+                <td>@item.Tag.TagNome</td>
                 <td>
                     <partial name="_ButtonPartial" model="@item.Id" />
                 </td>
@@ -34,7 +54,6 @@
         }
     </table>
 </div>
-
 @section scripts {
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
     <script type="text/javascript">
@@ -56,3 +75,4 @@
         });
     </script>
 }
+

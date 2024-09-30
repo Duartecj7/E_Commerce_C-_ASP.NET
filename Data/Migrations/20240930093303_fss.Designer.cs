@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Commerce_C__ASP.NET.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240829134931_ModelProduto")]
-    partial class ModelProduto
+    [Migration("20240930093303_fss")]
+    partial class fss
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,6 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Imagem")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
@@ -306,7 +305,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
 
             modelBuilder.Entity("E_Commerce_C__ASP.NET.Models.Produto", b =>
                 {
-                    b.HasOne("E_Commerce_C__ASP.NET.Models.SpecialTag", "TagNome")
+                    b.HasOne("E_Commerce_C__ASP.NET.Models.SpecialTag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,7 +317,7 @@ namespace E_Commerce_C__ASP.NET.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TagNome");
+                    b.Navigation("Tag");
 
                     b.Navigation("TipoProduto");
                 });

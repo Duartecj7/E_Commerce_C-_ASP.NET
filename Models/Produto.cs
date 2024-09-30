@@ -1,39 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using E_Commerce_C__ASP.NET.Models;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.ComponentModel.DataAnnotations;
 namespace E_Commerce_C__ASP.NET.Models
-{
+{ 
     public class Produto
     {
         public int Id { get; set; }
-        
-        [Required]
-        public string  Nome { get; set; }
-        
-        [Required]
-        public decimal Preco { get; set; }
-        
-        public string Imagem { get; set; }
-        
-        [Display(Name = "Cor do produto")]
-        public string Cor { get; set; }
-        
-        [Required]
-        [Display(Name = "Disponibilidade")]
-        public bool Disponivel { get; set; }
 
         [Required]
-        [Display(Name = "Tipo de Produto")]
-        public int TipoProdutoId { get; set; }
-       
-        [ForeignKey("TipoProdutoId")]
-        public TiposProduto TipoProduto { get; set; }
-        
+        public string Nome { get; set; }
+
         [Required]
+        public double Preco { get; set; }
+
+        public string? Imagem { get; set; }
+
+        [Display(Name = "Cor do produto")]
+        public string Cor { get; set; }
+
+        [Display(Name = "Disponibilidade")]
+        [Required]
+        public bool Disponivel { get; set; }
+
+        [Display(Name = "Tipo de Produto")]
+        [Required]
+        public int TipoProdutoId { get; set; }
+
+        public virtual TiposProduto? TipoProduto { get; set; }
+
         [Display(Name = "Tag do Produto")]
+        [Required]
         public int TagId { get; set; }
-        
-        [ForeignKey("TagId")]
-        public SpecialTag TagNome { get; set; }
+
+        public virtual SpecialTag? Tag { get; set; }
     }
 }
