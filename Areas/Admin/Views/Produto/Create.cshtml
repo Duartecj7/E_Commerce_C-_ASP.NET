@@ -1,14 +1,15 @@
 ﻿@model E_Commerce_C__ASP.NET.Models.Produto
 @{
-    ViewData["Title"] = "Criar";
+    ViewData["Title"] = "Criar Produto";
 }
-<br />
 
+<br />
 <h2 class="text-info">Adicionar Produto</h2>
+<br />
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div class="p-4 rounded border">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+        <h3>@ViewBag.message</h3>
         <div class="form-group row">
             <div class="col-2">
                 <label asp-for="Nome"></label>
@@ -81,11 +82,11 @@
             <span asp-validation-for="Disponivel" class="text-danger"></span>
         </div>
     </div>
-     
+    <br/>
 
         <div class="form-group">
-            <input type="submit" class="btn btn-primary" value="Save" />
-            <a asp-action="Index" class="btn btn-success">Back to List</a>
+            <input type="submit" class="btn btn-primary" value="Guardar Produto" />
+            <a asp-action="Index" class="btn btn-success">Voltar à lista</a>
         </div>
     </div>
 </form>

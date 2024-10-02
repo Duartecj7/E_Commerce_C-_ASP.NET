@@ -23,6 +23,15 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
             return View(_context.DbSet_Produto.Include(p=>p.TipoProduto).Include(s=>s.Tag).ToList());
         }
 
+        [HttpPost]
+        public IActionResult Index(double lowAmount,double largeAmount)
+        {
+            var produto = _context.DbSet_Produto.Include(p => p.TipoProduto).Include(s => s.Tag).Where(p => p.Preco >= lowAmount && p.Preco <= largeAmount).ToList();
+            if(lowAmount==0 && largeAmount ==0)
+                produto = _context.DbSet_Produto.Include(p => p.TipoProduto).Include(s => s.Tag).ToList();
+            return View(produto);
+        }
+
         public IActionResult Create()
         {
             ViewData["TipoProdutoId"] = new SelectList(_context.DbSet_TiposProduto.ToList(), "Id", "TipoProduto");
@@ -47,7 +56,7 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
                 // Verifique se o produto já existe
                 if (procuraProduto != null)
                 {
-                    ViewBag.message = "Produto existe";
+                    ViewBag.message = "Produto já existe";
                     ViewData["TipoProdutoId"] = new SelectList(_context.DbSet_TiposProduto.ToList(), "Id", "TipoProduto");
                     ViewData["TagId"] = new SelectList(_context.DbSet_Tags.ToList(), "Id", "TagNome");
                     return View(produto);

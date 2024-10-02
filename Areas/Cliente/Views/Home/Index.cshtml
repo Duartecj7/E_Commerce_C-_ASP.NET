@@ -1,8 +1,30 @@
-﻿@{
+﻿@using E_Commerce_C__ASP.NET.Models
+@model List<Produto>
+@{
     ViewData["Title"] = "Home Page";
 }
+<br />
+<div class="row">
+    @foreach (var produto in Model)
+    {
+        <div class="col-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">
+                        <label style="font-size:23px;color:steelblue">@produto.Nome</label>
+                    </h4>
+                </div>
+                <img src="@produto.Imagem" alt="Card Image" class="card-img-top" style="height:300px;" />
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <label style="font-size:20px;color:steelblue"><b>Preço : @produto.Preco €</b></label>
+                        </div>
+                        <a asp-action="Details" asp-controller="Home" asp-route-id="@produto.Id" class="btn btn-info pull-right btn-outline-success" style="color:black"> <i class="fas fa-search"></i> <b>Ver</b></a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    }
 </div>

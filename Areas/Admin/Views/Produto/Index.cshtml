@@ -10,12 +10,28 @@
         <h2 class="text-info">Lista de Produtos </h2>
     </div>
     <div class="col-6 d-flex justify-content-end">
-        <a asp-action="Create" class="btn btn-info">&nbsp;Novo Produto</a>
+        <a asp-action="Create" class="btn btn-info"><i class="fas fa-plus"></i> &nbsp;Novo Produto</a>
     </div>
 </div>
 <br />
+    <form method="post">
+        <div class="row">
+            <div class="col-3">
+                <input type="number" class="form-control" name="lowAmount"/>
+            </div>
+            <div class="col-3">
+            <input type="number" class="form-control" name="largeAmount" />
+            </div>
+            <div class="col-3">
+                <input type="submit" value="Procurar entre preços" class="btn btn-success"/>
+            </div>
+            
+        </div>
+    </form>
+<br />
 <div>
-    <table class="table table-striped border">
+    <table id="myTable" class="table table-striped border">
+        <thead>
         <tr class="table-info">
             <th>
                 @Html.DisplayNameFor(p => p.Nome)
@@ -38,6 +54,8 @@
             <th />
             <th />
         </tr>
+        </thead>
+        <tbody>
         @foreach (var item in Model)
         {
             <tr>
@@ -52,12 +70,56 @@
                 </td>
             </tr>
         }
+        </tbody>
     </table>
 </div>
 @section scripts {
-    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+    <!-- Bibliotecas necessárias para os botões -->
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+
+    <!-- CSS para DataTables e Botões -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css" />
+
+    
+
     <script type="text/javascript">
-        $(function () {
+        $(document).ready(function () {
+            // Inicializa DataTables com botões e tradução para português de Portugal
+            let table = new DataTable('#myTable', {
+                language: {
+                    "sEmptyTable": "Não há dados disponíveis na tabela",
+                    "sInfo": "A mostrar de _START_ até _END_ de _TOTAL_ entradas",
+                    "sInfoEmpty": "A mostrar 0 até 0 de 0 entradas",
+                    "sInfoFiltered": "(filtrado de _MAX_ entradas no total)",
+                    "sLengthMenu": "Mostrar _MENU_ entradas",
+                    "sLoadingRecords": "A carregar...",
+                    "sProcessing": "A processar...",
+                    "sSearch": "Pesquisar:",
+                    "sZeroRecords": "Nenhum registo encontrado",
+                    "oPaginate": {
+                        "sFirst": "Primeiro",
+                        "sLast": "Último",
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ativar para ordenar a coluna de forma ascendente",
+                        "sSortDescending": ": Ativar para ordenar a coluna de forma descendente"
+                    }
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf', 'print', 'csv'
+                ]
+            });
+
+            // Exibir mensagens de sucesso ou erro
             var save = '@TempData["save"]';
             if (save) {
                 alertify.success(save);
@@ -75,4 +137,7 @@
         });
     </script>
 }
+
+
+
 

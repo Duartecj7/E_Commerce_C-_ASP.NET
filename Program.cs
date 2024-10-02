@@ -45,10 +45,11 @@ app.UseEndpoints(endpoints =>
 
     // Rota padrão default
     endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+       name: "default",
+       pattern: "{controller=Home}/{action=Index}/{id?}",
+       defaults: new { area = "Cliente", controller = "Home", action = "Index" }
+   );
 });
-
 app.MapRazorPages();
 
 app.Run();
