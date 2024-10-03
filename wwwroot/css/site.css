@@ -20,3 +20,46 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.cart-container {
+    position: fixed;
+    bottom: 20px; /* Distância do fundo do browser */
+    right: 20px; /* Distância da direita do browser */
+    z-index: 1000; /* Certifica que o carrinho fique acima de outros elementos */
+}
+
+#cartItems {
+    width: 300px; /* Defina a largura do carrinho */
+    max-height: 400px; /* Defina uma altura máxima para o carrinho */
+    overflow-y: auto; /* Adiciona rolagem se os itens excederem a altura */
+    border: 1px solid #ccc; /* Adiciona uma borda ao carrinho */
+    background-color: white; /* Fundo branco */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra para dar destaque */
+    padding: 10px; /* Espaçamento interno */
+    border-radius: 5px; /* Cantos arredondados */
+}
+
+.cart-item-image {
+    width: 50px; /* Tamanho da imagem do produto */
+    height: auto; /* Manter a proporção da imagem */
+    margin-right: 10px; /* Espaçamento à direita da imagem */
+    display: inline-block; /* Permitir que a imagem fique ao lado do texto */
+}
+
+.list-group-item {
+    display: flex; /* Usar flexbox para alinhar imagem e texto */
+    align-items: center; /* Alinha itens verticalmente */
+    padding: 5px; /* Reduzir espaçamento */
+}
+
+.total {
+    margin-left: auto; /* Empurra o total para o lado direito */
+    font-weight: bold; /* Destaca o total */
+    text-align: right; /* Alinha à direita */
+}
+
+.cart-container button {
+    margin-right: 1px; /* Espaçamento entre os botões */
+    justify-content:left
+}

@@ -1,0 +1,75 @@
+﻿@using E_Commerce_C__ASP.NET.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var produtos = HttpContextAccessor.HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
+    int cont = produtos.Count;
+    double total = produtos.Sum(p => p.Preco); // Calcular o total
+}
+
+<div class="cart-container">
+    <button class="btn btn-outline-primary" id="cartButton" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        Carrinho (<span id="cartCount">@cont</span>)
+    </button>
+    <div id="cartItems" class="d-none">
+        <ul class="list-group mt-2">
+            @foreach (var produto in produtos)
+            {
+                <li class="list-group-item">
+                    <img src="~/@produto.Imagem" class="cart-item-image" alt="@produto.Nome" />
+                    <span>@produto.Nome</span> - <span>@produto.Preco.ToString("C")</span> 
+                </li>
+            }
+        </ul>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="d-flex">
+                <button class="btn btn-success btn-sm me-2" onclick="finalizePurchase()">
+                    <i class="fas fa-receipt"></i> Finalizar Compra
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="emptyCart()">
+                    <i class="fas fa-recycle"></i> Esvaziar Carrinho
+                </button>
+            </div>
+            <div class="total">
+                Total: <span>@total.ToString("C")</span> 
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    function toggleCart() {
+        var cartItems = document.getElementById("cartItems");
+        var cartButton = document.getElementById("cartButton");
+
+        if (cartItems.classList.contains("d-none")) {
+            cartItems.classList.remove("d-none");
+            cartItems.classList.add("cart-open"); 
+        } else {
+            cartItems.classList.add("d-none");
+            cartItems.classList.remove("cart-open"); 
+        }
+    }
+    function emptyCart() {
+        fetch('/Home/EmptyCart', {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("cartItems").innerHTML = '';
+                    document.getElementById("cartCount").innerText = 0;
+                    alert("Carrinho esvaziado com sucesso!");
+                } else {
+                    alert("Erro ao esvaziar o carrinho.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                alert("Erro ao esvaziar o carrinho.");
+            });
+    }
+
+</script>

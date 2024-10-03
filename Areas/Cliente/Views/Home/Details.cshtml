@@ -1,11 +1,21 @@
 ﻿@model E_Commerce_C__ASP.NET.Models.Produto
+
+@using E_Commerce_C__ASP.NET.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "Detalhes do Produto";
+}
+@{
+    List<Produto> produtos = HttpContextAccessor.HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos");
+    Produto produto = null;
+    if (produtos != null)
+        produto = produtos.FirstOrDefault(p =>p.Id == Model.Id);
 }
 <br />
 
 <h2 class="text-info">Detalhes do Produto</h2>
-<form asp-action="" method="post" enctype="multipart/form-data">
+<form asp-action="Details" method="post" enctype="multipart/form-data">
     <div class="p-4 rounded border row">
         <div asp-validation-summary="ModelOnly" class="text-danger">
         </div>
@@ -74,6 +84,15 @@
                         <button type="submit" class="btn btn-info">
                             <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
                         </button>
+                        if(produto != null)
+                        {
+                            <button type="submit" class="btn btn-danger form-control" asp-action="Remove" asp-route-id="@Model.Id"><i class="fas fa-trash"></i>   Remover</button>  
+                        }
+                        else
+                        {
+                            <button type="submit" disabled="true" class="btn btn-danger form-control" asp-action="Remove" asp-route-id="@Model.Id"><i class="fas fa-trash"></i>   Remover</button>
+                        }
+
                     }
                     else
                     {
