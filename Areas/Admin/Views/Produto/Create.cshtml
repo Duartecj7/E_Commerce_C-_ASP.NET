@@ -71,7 +71,20 @@
             <span asp-validation-for="TagId" class="text-danger"></span>
         </div>
 
-     
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="Stock"></label>
+            </div>
+            <div class="col-5">
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-secondary" onclick="decreaseStock()"><i class="fas fa-minus"></i></button>
+                    <input asp-for="Stock" id="stockInput" class="form-control text-center" type="number" min="0" value="0" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="increaseStock()"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+
         <div class="form-group row">
             <div class="col-2">
                 <label asp-for="Disponivel"></label>
@@ -92,6 +105,31 @@
 </form>
 
 @section Scripts {
+    <script type="text/javascript">
+        // Função para aumentar o valor do stock
+        function increaseStock() {
+            var stockInput = document.getElementById("stockInput");
+            var currentValue = parseInt(stockInput.value) || 0;
+            stockInput.value = currentValue + 1;
+        }
+
+        // Função para diminuir o valor do stock
+        function decreaseStock() {
+            var stockInput = document.getElementById("stockInput");
+            var currentValue = parseInt(stockInput.value) || 0;
+            if (currentValue > 0) {
+                stockInput.value = currentValue - 1;
+            }
+        }
+
+        // Impede o usuário de inserir caracteres não numéricos diretamente no campo de Stock
+        document.getElementById("stockInput").addEventListener("input", function (e) {
+            var value = e.target.value;
+            e.target.value = value.replace(/[^0-9]/g, ''); // Remove qualquer caractere que não seja número
+        });
+    </script>
+
+    <!-- Scripts de validação padrão do ASP.NET -->
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

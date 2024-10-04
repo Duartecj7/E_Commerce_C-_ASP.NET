@@ -1,0 +1,70 @@
+﻿@using E_Commerce_C__ASP.NET.Models
+@model List<Produto>
+
+@{
+    ViewData["Title"] = "Carrinho";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<h1>O seu carrinho:</h1>
+<br />
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        Carrinho vazio.
+    </div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Ver Produtos</a>
+}
+else
+{
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Imagem</th>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Tipo de produto</th>
+                    <th>Cor</th>
+                    <th>Quantidade</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="~/@item.Imagem" width="200px" height="150px" />
+                        </td>
+                        <td>@item.Nome</td>
+                        <td>@item.Preco.ToString("C")</td>
+                        <td>@item.Tag</td>
+                        <td>@item.Cor</td>
+                        <td>@item.Quantidade</td>
+                        <td>
+                            <a asp-area="Cliente" asp-action="Remove" asp-controller="Home" class="btn btn-danger" asp-route-id="@item.Id">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Total: @Model.Sum(item => item.Preco * item.Quantidade).ToString()</h4>
+                <a asp-action="EmptyCart" asp-controller="Home" class="btn btn-warning">Esvaziar Carrinho</a>
+                <a asp-action="Checkout" asp-controller="Home" class="btn btn-success">Checkout</a>
+            </div>
+        </div>
+    </div>
+}

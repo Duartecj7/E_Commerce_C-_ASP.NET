@@ -53,7 +53,6 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
             ModelState.Remove("Imagem");
             if (ModelState.IsValid)
             {
-                // Verifique se o produto já existe
                 if (procuraProduto != null)
                 {
                     ViewBag.message = "Produto já existe";
@@ -62,7 +61,6 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
                     return View(produto);
                 }
 
-                // Processamento da imagem
                 if (imagem != null)
                 {
                     var name = Path.Combine(_hostEnvironment.WebRootPath + "/Imagens", Path.GetFileName(imagem.FileName));
@@ -74,13 +72,11 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
                     produto.Imagem = "Imagens/No-Image.png";
                 }
 
-                // Adiciona o produto ao contexto e salva
                 _context.DbSet_Produto.Add(produto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
-            // Recarregue as listas para exibir na view se ModelState não for válido
             ViewData["TipoProdutoId"] = new SelectList(_context.DbSet_TiposProduto.ToList(), "Id", "TipoProduto");
             ViewData["TagId"] = new SelectList(_context.DbSet_Tags.ToList(), "Id", "TagNome");
             return View(produto);
@@ -107,39 +103,32 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
         {
             if (produto != null)
             {
-                // Associa Tag e TipoProduto ao produto
                 SpecialTag tag = _context.DbSet_Tags.FirstOrDefault(i => i.Id == produto.TagId);
                 TiposProduto tipo = _context.DbSet_TiposProduto.FirstOrDefault(i => i.Id == produto.TipoProdutoId);
                 produto.Tag = tag;
                 produto.TipoProduto = tipo;
             }
 
-            // Remover a validação do campo Imagem do ModelState
             ModelState.Remove("Imagem");
 
             if (ModelState.IsValid)
             {
-                // Processamento da imagem
                 if (imagem != null)
                 {
-                    // Se uma nova imagem foi enviada, salvar a nova imagem
                     var name = Path.Combine(_hostEnvironment.WebRootPath + "/Imagens", Path.GetFileName(imagem.FileName));
                     await imagem.CopyToAsync(new FileStream(name, FileMode.Create));
                     produto.Imagem = "Imagens/" + imagem.FileName;
                 }
                 else if (string.IsNullOrEmpty(produto.Imagem))
                 {
-                    // Se não há imagem e o produto não tem uma imagem definida, usar uma imagem padrão
                     produto.Imagem = "Imagens/No-Image.png";
                 }
 
-                // Atualiza o produto no contexto e salva as mudanças
                 _context.DbSet_Produto.Update(produto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
-            // Recarregue as listas para exibir na view se ModelState não for válido
             ViewData["TipoProdutoId"] = new SelectList(_context.DbSet_TiposProduto.ToList(), "Id", "TipoProduto");
             ViewData["TagId"] = new SelectList(_context.DbSet_Tags.ToList(), "Id", "TagNome");
             return View(produto);

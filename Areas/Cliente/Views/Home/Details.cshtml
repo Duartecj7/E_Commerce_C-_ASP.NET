@@ -10,7 +10,7 @@
     List<Produto> produtos = HttpContextAccessor.HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos");
     Produto produto = null;
     if (produtos != null)
-        produto = produtos.FirstOrDefault(p =>p.Id == Model.Id);
+        produto = produtos.FirstOrDefault(p => p.Id == Model.Id);
 }
 <br />
 
@@ -41,7 +41,6 @@
                 </div>
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
-
 
             <div class="form-group row mb-3">
                 <div class="col-4">
@@ -75,43 +74,51 @@
 
             <div class="form-group row mb-3">
                 <div class="col-4">
-                
                 </div>
                 <div class="col-8">
-                    @if (Model.Disponivel)
+                    @if (!Model.Disponivel)
+                    {
+                        <span class="text-danger">Produto Indisponível</span>
+                    }
+                    else if (Model.Stock == 0)
+                    {
+                        <span class="text-danger">Fora de Stock</span>
+                        <img src="~/Imagens/out-stock.png" style="width:35px; height:35px;" />
+                    }
+                    else
                     {
                         <img src="~/Imagens/in-stock.png" style="width:35px; height:35px;" />
                         <button type="submit" class="btn btn-info">
                             <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
                         </button>
-                        if(produto != null)
+
+                        @if (produto != null)
                         {
-                            <button type="submit" class="btn btn-danger form-control" asp-action="Remove" asp-route-id="@Model.Id"><i class="fas fa-trash"></i>   Remover</button>  
+                            <button type="submit" class="btn btn-danger form-control" asp-action="Remove" asp-route-id="@Model.Id"><i class="fas fa-trash"></i>   Remover</button>
                         }
                         else
                         {
                             <button type="submit" disabled="true" class="btn btn-danger form-control" asp-action="Remove" asp-route-id="@Model.Id"><i class="fas fa-trash"></i>   Remover</button>
                         }
-
                     }
-                    else
-                    {
-                        <img src="~/Imagens/out-stock.png" style="width:35px; height:35px;" />
-
-                    }
-                   
                 </div>
             </div>
         </div>
 
         <div class="col-8 text-center">
-            <img src="~/@Model.Imagem" class="img-fluid" alt="Imagem do Produto" />
-           
+            @if (!Model.Disponivel || Model.Stock == 0)
+            {
+                <img src="~/Imagens/out-stock-large.png" class="img-fluid" alt="Produto Fora de Stock" />
+            }
+            else
+            {
+                <img src="~/@Model.Imagem" class="img-fluid" alt="Imagem do Produto" />
+            }
         </div>
     </div>
 
     <div class="form-group mt-3">
-        <a asp-action="Index" class="btn btn-success">Back to List</a>
+        <a asp-action="Index" class="btn btn-success">Voltar à Lista</a>
     </div>
 </form>
 

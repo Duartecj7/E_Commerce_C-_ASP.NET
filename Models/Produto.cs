@@ -33,5 +33,8 @@ namespace E_Commerce_C__ASP.NET.Models
         public int TagId { get; set; }
 
         public virtual SpecialTag? Tag { get; set; }
+        [Required]
+        public int Stock { get; set; }
+        public int? Quantidade { get; set; } = 1;
     }
 }
