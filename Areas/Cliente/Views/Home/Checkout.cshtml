@@ -1,0 +1,92 @@
+﻿@using E_Commerce_C__ASP.NET.Models
+@model Pedido
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Finalizar Compra</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="FinalizarPedido" method="post">
+                <div class="form-group">
+                    <label for="Nome">Nome</label>
+                    <input type="text" class="form-control" id="Nome" name="Nome" required />
+                </div>
+                <div class="form-group">
+                    <label for="NumTel">Número de Telefone</label>
+                    <input type="text" class="form-control" id="NumTel" name="NumTel" required />
+                </div>
+                <div class="form-group">
+                    <label for="Email">Email</label>
+                    <input type="email" class="form-control" id="Email" name="Email" required />
+                </div>
+                <div class="form-group">
+                    <label for="Morada">Morada</label>
+                    <input type="text" class="form-control" id="Morada" name="Morada" required />
+                </div>
+                <div class="form-group">
+                    <label for="codigoPost">Código de Postal</label>
+                    <input type="text" class="form-control" name="codigoPost" maxlength="8" required oninput="formatCodigoPostal(this)" placeholder="0000-111" />
+                </div>
+                <div class="form-group">
+                    <label for="Localidade">Localidade</label>
+                    <input type="text" class="form-control" id="Localidade" name="Localidade" required />
+                </div>
+
+                <button type="submit" class="btn btn-success">Finalizar Pedido</button>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Produtos do Pedido</h2>
+            @if (Model.ItensPedido != null && Model.ItensPedido.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Nome</th>
+                            <th>Tipo de produto</th>
+                            <th>Cor</th>
+                            <th>Quantidade</th>
+                            <th>Preço    </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ItensPedido)
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/@item.Produto.Imagem" width="100px" height="75px" />
+                                </td>
+                                <td>@item.Produto.Nome</td>
+                                <td>@item.Produto.Tag.TagNome</td>
+                                <td>@item.Produto.Cor</td>
+                                <td>@item.Quantidade</td>
+                                <td>@item.Preco.ToString("C")  </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <h4>Total: @Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")</h4>
+            }
+            else
+            {
+                <p>Nenhum produto no pedido.</p>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function formatCodigoPostal(input) {
+        let value = input.value.replace(/\D/g, '');
+
+        if (value.length > 4) {
+            value = value.slice(0, 4) + '-' + value.slice(4, 7);
+        }
+
+        input.value = value.slice(0, 8);
+    }
+</script>

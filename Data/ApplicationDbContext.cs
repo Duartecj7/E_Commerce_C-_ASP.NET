@@ -13,5 +13,7 @@ namespace E_Commerce_C__ASP.NET.Data
         public DbSet<TiposProduto> DbSet_TiposProduto { get; set;}
         public DbSet<SpecialTag> DbSet_Tags { get; set;}
         public DbSet<Produto> DbSet_Produto { get; set; }
+        public DbSet<Pedido> DbSet_Pedido { get; set; }
+        public DbSet<ItemPedido> DbSet_ItemPedido { get; set; }
     }
 }

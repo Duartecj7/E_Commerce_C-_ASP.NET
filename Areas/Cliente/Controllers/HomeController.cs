@@ -222,5 +222,66 @@ namespace E_Commerce_C__ASP.NET.Areas.Cliente.Controllers
             ViewBag.Error = TempData["Error"];
             return View(produtos);
         }
+
+        [HttpGet]
+        public IActionResult Checkout()
+        {
+            var produtos = HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
+
+            if (!produtos.Any())
+            {
+                TempData["Error"] = "O carrinho está vazio. Adicione produtos antes de finalizar a compra.";
+                return RedirectToAction("Carrinho");
+            }
+
+            var itensPedido = produtos.Select(p => new ItemPedido
+            {
+                Produto = p,
+                Quantidade = (int)p.Quantidade,
+                Preco = p.Preco,
+            }).ToList();
+
+            var pedido = new Pedido
+            {
+                ItensPedido = itensPedido,
+            };
+
+            return View(pedido); 
+        }
+
+
+        [HttpPost]
+        public IActionResult FinalizarPedido(Pedido pedido)
+        {
+            var produtos = HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
+
+            if (produtos == null || !produtos.Any())
+            {
+                TempData["Error"] = "O carrinho está vazio. Adicione produtos antes de finalizar a compra.";
+                return RedirectToAction("Carrinho");
+            }
+
+            pedido.NumPedido = Guid.NewGuid().ToString(); 
+            pedido.DataPedido = DateTime.Now;
+
+            foreach (var produto in produtos)
+            {
+                pedido.ItensPedido.Add(new ItemPedido
+                {
+                    ProdutoId = produto.Id,
+                    Preco = produto.Preco,
+                    Quantidade = (int)produto.Quantidade
+                });
+            }
+
+            _context.DbSet_Pedido.Add(pedido);
+            _context.SaveChanges();
+
+            HttpContext.Session.Remove("produtos");
+
+            return RedirectToAction("Index", "Home");
+        }
+
+
     }
 }

@@ -71,5 +71,8 @@
                 alert("Erro ao esvaziar o carrinho.");
             });
     }
+    function finalizePurchase() {
+        window.location.href = '@Url.Action("Checkout", "Home", new { area = "Cliente" })';
+    }
 
 </script>
