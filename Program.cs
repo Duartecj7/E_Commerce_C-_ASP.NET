@@ -1,8 +1,19 @@
 using E_Commerce_C__ASP.NET.Data;
+using E_Commerce_C__ASP.NET.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adicionar configurações do Stripe
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+
+// Inicializar a API do Stripe com a chave secreta
+var stripeSettings = new StripeSettings();
+builder.Configuration.GetSection("Stripe").Bind(stripeSettings);
+StripeConfiguration.ApiKey = stripeSettings.SecretKey;
+
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

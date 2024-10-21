@@ -137,11 +137,18 @@ namespace E_Commerce_C__ASP.NET.Areas.Admin.Controllers
 
         public IActionResult Details(int? id)
         {
-            if (id == null)
-                return NotFound();
-            var produto = _context.DbSet_Produto.Include(p => p.TipoProduto).Include(p => p.Tag).FirstOrDefault(c => c.Id == id);
+            //if (id == null)
+            //    return NotFound();
+            //var produto = _context.DbSet_Produto.Include(p => p.TipoProduto).Include(p => p.Tag).FirstOrDefault(c => c.Id == id);
+            //if (produto == null)
+            //    return NotFound();
+            //return View(produto);
+
+            var produto = _context.DbSet_Produto.Find(id);
             if (produto == null)
+            {
                 return NotFound();
+            }
             return View(produto);
         }
 
