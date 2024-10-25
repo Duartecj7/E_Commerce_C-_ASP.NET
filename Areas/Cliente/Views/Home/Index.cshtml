@@ -4,27 +4,118 @@
     ViewData["Title"] = "Home Page";
 }
 <br />
+<div id="message-container" style="display:none;">
+    @if (TempData["Success"]==( "Pedido finalizado com sucesso!"))
+    {
+        <div id="success-message" class="alert alert-success"></div>
+    }
+    else
+    {
+        <div id="error-message" class="alert alert-danger"></div>
+
+    }
+</div>
+
 <div class="row">
     @foreach (var produto in Model)
     {
-        <div class="col-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">
-                        <label style="font-size:23px;color:steelblue">@produto.Nome</label>
-                    </h4>
+        <div class="col-4 card-container">
+            <div class="card">
+                <div class="card-front">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">
+                            <label style="font-size:23px;color:steelblue">@produto.Nome</label>
+                        </h4>
+                    </div>
+                    <img src="@produto.Imagem" alt="Card Image" class="card-img-top" style="height:300px;" />
                 </div>
-                <img src="@produto.Imagem" alt="Card Image" class="card-img-top" style="height:300px;" />
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <label style="font-size:20px;color:steelblue"><b>Preço : @produto.Preco €</b></label>
+                <div class="card-back">
+                    <h4>@produto.Nome</h4>
+                    <div class="btn-group">
+                        <label style="font-size:20px;color:steelblue"><b>Preço : @produto.Preco €</b></label>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <div class="col-4">
                         </div>
-                        <a asp-action="Details" asp-controller="Home" asp-route-id="@produto.Id" class="btn btn-info pull-right btn-outline-success" style="color:black"> <i class="fas fa-search"></i> <b>Ver</b></a>
+                        <div class="col-8">
+                            @if (!produto.Disponivel)
+                            {
+                                <span class="text-danger">Produto Indisponível</span>
+                            }
+                            else if (produto.Stock == 0)
+                            {
+                                <span class="text-danger">Fora de Stock</span>
+                                <img src="~/Imagens/out-stock.png" style="width:35px; height:35px;" />
+                            }
+                            else
+                            {
+                                <img src="~/Imagens/in-stock.png" style="width:35px; height:35px;" />
+                            }
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <a asp-action="Details" asp-controller="Home" asp-route-id="@produto.Id" class="btn btn-info pull-right btn-outline-success" style="color:black">
+                            <i class="fas fa-search"></i> <b>Ver</b>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-
     }
+    
+
 </div>
+
+<script>
+    // Função para girar o cartão ao clicar
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function () {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('card-flip'));
+
+            this.classList.toggle('card-flip');
+        });
+    });
+
+    // Função para girar todos os cartões ao carregar a página
+    window.addEventListener('load', function () {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('card-flip'); 
+                setTimeout(() => {
+                    card.classList.remove('card-flip'); 
+                }, 500); 
+            }, index * 750); 
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtém as mensagens do TempData
+        var successMessage = '@TempData["Success"]';
+        var errorMessage = '@TempData["Error"]';
+
+        // Seleciona o container das mensagens
+        var messageContainer = document.getElementById("message-container");
+
+        // Verifica se há uma mensagem de sucesso
+        if (successMessage == "Pedido finalizado com sucesso!") {
+            document.getElementById("success-message").innerText = successMessage;
+            messageContainer.style.display = "block";
+
+            // Remove a mensagem após 5 segundos
+            setTimeout(function () {
+                messageContainer.style.display = "none";
+            }, 5000);
+        }
+        // Verifica se há uma mensagem de erro, se não houver mensagem de sucesso
+        else if (errorMessage ) {
+            document.getElementById("error-message").innerText = errorMessage;
+            messageContainer.style.display = "block";
+
+            // Remove a mensagem após 5 segundos
+            setTimeout(function () {
+                messageContainer.style.display = "none";
+            }, 5000);
+        }
+    });
+</script>

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<E_Commerce_C__ASP.NET.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Lista de Pedidos";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Número do Pedido</th>
+            <th>Nome do Cliente</th>
+            <th>Número de Telefone</th>
+            <th>Email</th>
+            <th>Morada</th>
+            <th>Código Postal</th>
+            <th>Localidade</th>
+            <th>Status</th>
+            <th>Data do Pedido</th>
+            <th>Quantidade de Itens</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in Model)
+        {
+            <tr>
+                <td>@pedido.NumPedido</td>
+                <td>@pedido.Nome</td>
+                <td>@pedido.NumTel</td>
+                <td>@pedido.Email</td>
+                <td>@pedido.Morada</td>
+                <td>@pedido.CodigoPost</td>
+                <td>@pedido.Localidade</td>
+                <td>@pedido.Status</td>
+                <td>@pedido.DataPedido.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @pedido.QuantItens
+                    <i id="icon-@pedido.Id" class="fas fa-chevron-down" style="cursor: pointer;" onclick="toggleDropdown('@pedido.Id')"></i>
+
+                    <div id="dropdown-@pedido.Id" class="dropdown-content" style="display:none;" onmouseleave="hideDropdown('@pedido.Id')">
+                        <ul>
+                            @foreach (var item in pedido.ItensPedido)
+                            {
+                                <li style="display: flex; align-items: start;">
+                                    <img src="@Url.Content("~/" + item.Produto.Imagem)" alt="~\Imagens\No-Image.png" style="width: 30px; height: 30px;margin-right:20px" />
+                                    <span>@item.Produto.Nome - Quantidade: @item.Quantidade</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </td>
+                <td>@pedido.PrecoFinal €</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script>
+        var currentOpenDropdown = null;  // Variável global para controlar o dropdown atual
+
+        // Alterna entre mostrar/ocultar o dropdown e altera o ícone
+        function toggleDropdown(pedidoId) {
+            var dropdown = document.getElementById('dropdown-' + pedidoId);
+            var icon = document.getElementById('icon-' + pedidoId);
+
+            // Fecha qualquer dropdown que esteja aberto
+            if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
+                currentOpenDropdown.style.display = "none";
+                var currentIcon = currentOpenDropdown.previousElementSibling;  // ícone correspondente
+                if (currentIcon) {
+                    currentIcon.classList.remove("fa-chevron-up");
+                    currentIcon.classList.add("fa-chevron-down");
+                }
+            }
+
+            // Alterna o dropdown atual
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+                icon.classList.remove("fa-chevron-down");
+                icon.classList.add("fa-chevron-up");
+                currentOpenDropdown = dropdown;  // Define o dropdown atual como aberto
+            } else {
+                dropdown.style.display = "none";
+                icon.classList.remove("fa-chevron-up");
+                icon.classList.add("fa-chevron-down");
+                currentOpenDropdown = null;  // Nenhum dropdown está aberto agora
+            }
+        }
+
+        // Oculta o dropdown quando o mouse sai da área
+        function hideDropdown(pedidoId) {
+            var dropdown = document.getElementById('dropdown-' + pedidoId);
+            var icon = document.getElementById('icon-' + pedidoId);
+
+            dropdown.style.display = "none";
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            currentOpenDropdown = null;  // Reseta o dropdown atual
+        }
+    </script>
+}

@@ -68,6 +68,10 @@ app.UseEndpoints(endpoints =>
        pattern: "{controller=Home}/{action=Index}/{id?}",
        defaults: new { area = "Cliente", controller = "Home", action = "Index" }
    );
+    endpoints.MapAreaControllerRoute(
+    name: "PedidosCliente",
+    areaName: "Cliente",
+    pattern: "Cliente/{controller=PedidosCliente}/{action=Index}/{id?}");
 });
 app.MapRazorPages();
 

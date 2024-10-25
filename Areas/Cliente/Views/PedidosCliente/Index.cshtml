@@ -1,0 +1,164 @@
+﻿@model IEnumerable<E_Commerce_C__ASP.NET.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Meus Pedidos";
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p>Nenhum pedido encontrado.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Número do Pedido</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Data do Pedido</th>
+                <th>Total</th>
+                <th>Quantidade de Itens</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pedido in Model)
+            {
+                <tr>
+                    <td>@pedido.NumPedido</td>
+                    <td>@pedido.Nome</td>
+                    <td>@pedido.Email</td>
+                    <td>@pedido.Status</td>
+                    <td>@pedido.DataPedido.ToString("dd/MM/yyyy")</td>
+                    <td>@pedido.PrecoFinal €</td>
+                    <td>
+                        @pedido.QuantItens
+                        <i id="icon-@pedido.Id" class="fas fa-chevron-down" style="cursor: pointer;" onclick="toggleDropdown('@pedido.Id')"></i>
+
+                        <div id="dropdown-@pedido.Id" class="dropdown-content" style="display:none;" onmouseleave="hideDropdown('@pedido.Id')">
+                            <ul>
+                                @foreach (var item in pedido.ItensPedido)
+                                {
+                                    <li style="display: flex; align-items: start;">
+                                        <img src="@Url.Content("~/" + item.Produto.Imagem)" alt="~\Imagens\No-Image.png" style="width: 30px; height: 30px;margin-right:20px" />
+                                        <span>@item.Produto.Nome - Quantidade: @item.Quantidade</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("PedidoSucesso", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-info" title="Detalhes">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <form action="@Url.Action("EliminarPedido", "PedidosCliente", new { numPedido = pedido.Id })" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" title="Eliminar Pedido" onclick="return confirm('Tem certeza que deseja eliminar este pedido?');">
+                                <i class="fas fa-trash"></i> 
+                            </button>
+                        </form>
+                        <a href="@Url.Action("EditarPedido", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-warning" title="Atualizar"><i class="fas fa-edit"></i> </a>
+                        <a href="@Url.Action("FaturaPedido", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-sucess" title="Fatura"> <i class="fas fa-file-download"></i></a>
+                        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#paymentModal"
+                           onclick="loadPaymentPartial('@pedido.Id')">
+                            <i class="fas fa-money-bill-wave"></i> Pagar
+                        </a>
+                    </td>
+                </tr>
+            }
+            <!-- Modal -->
+            <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="paymentModalLabel">Pagamento</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- O conteúdo da partial view será carregado aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tbody>
+    </table>
+    @section Scripts {
+    <script>
+        var currentOpenDropdown = null;  // Variável global para controlar o dropdown atual
+
+        // Alterna entre mostrar/ocultar o dropdown e altera o ícone
+        function toggleDropdown(pedidoId) {
+            var dropdown = document.getElementById('dropdown-' + pedidoId);
+            var icon = document.getElementById('icon-' + pedidoId);
+
+            // Fecha qualquer dropdown que esteja aberto
+            if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
+                currentOpenDropdown.style.display = "none";
+                var currentIcon = currentOpenDropdown.previousElementSibling;  // ícone correspondente
+                if (currentIcon) {
+                    currentIcon.classList.remove("fa-chevron-up");
+                    currentIcon.classList.add("fa-chevron-down");
+                }
+            }
+
+            // Alterna o dropdown atual
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "block";
+                icon.classList.remove("fa-chevron-down");
+                icon.classList.add("fa-chevron-up");
+                currentOpenDropdown = dropdown;  // Define o dropdown atual como aberto
+            } else {
+                dropdown.style.display = "none";
+                icon.classList.remove("fa-chevron-up");
+                icon.classList.add("fa-chevron-down");
+                currentOpenDropdown = null;  // Nenhum dropdown está aberto agora
+            }
+        }
+
+        // Oculta o dropdown quando o mouse sai da área
+        function hideDropdown(pedidoId) {
+            var dropdown = document.getElementById('dropdown-' + pedidoId);
+            var icon = document.getElementById('icon-' + pedidoId);
+
+            dropdown.style.display = "none";
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            currentOpenDropdown = null;  // Reseta o dropdown atual
+        }
+
+        function loadPaymentPartial(pedidoId) {
+            $.ajax({
+                url: '@Url.Action("LoadPagamentoPartial", "PedidosCliente")',
+                type: 'GET',
+                data: { id: pedidoId },
+                success: function (result) {
+                    $('#paymentModal .modal-body').html(result);
+                    $('#paymentModal').modal('show');
+                },
+                error: function () {
+                    alert('Erro ao carregar os detalhes do pagamento.');
+                }
+            });
+        }
+
+    </script>
+}
+}

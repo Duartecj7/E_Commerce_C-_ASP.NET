@@ -11,7 +11,20 @@
     <div class="row">
         <!-- Lado Esquerdo: Dados do Cliente -->
         <div class="col-md-6">
-            <form asp-action="ProcessPayment" asp-controller="Home" asp-area="Cliente" method="post" id="payment-form">
+            <form asp-action="FinalizarPedido" asp-controller="PedidosCliente" asp-area="Cliente" method="post">
+                <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                @if (Model.ItensPedido != null && Model.ItensPedido.Any())
+                {
+                    // Utiliza um contador manual para os índices
+                    int index = 0;
+                    foreach (var item in Model.ItensPedido)
+                    {
+                        <input type="hidden" name="items[@index].ProdutoId" value="@item.ProdutoId" />
+                        <input type="hidden" name="items[@index].Preco" value="@item.Preco" />
+                        <input type="hidden" name="items[@index].Quantidade" value="@item.Quantidade" />
+                        index++;
+                    }
+                }
                 <div class="form-group">
                     <label for="Nome">Nome</label>
                     <input type="text" class="form-control" id="Nome" name="Nome" required />
@@ -38,13 +51,13 @@
                 </div>
                 <div class="form-group">
                     <label for="payment-method">Escolha o método de pagamento</label>
-                    <select class="form-control" id="payment-method" name="paymentMethod" onchange="togglePaymentFields()">
-                        <option value="stripe">Cartão de Crédito </option>
-                        <option value="mbway">MB WAY </option>
-                        <option value="referencia">Entidade e Referência  </option>
+                    <select class="form-control" id="payment-method" name="TipoPagamento" onchange="togglePaymentFields()">
+                        <option value="stripe">Cartão de Crédito</option>
+                        <option value="mbway">MB WAY</option>
+                        <option value="referencia">Entidade e Referência</option>
                     </select>
                 </div>
-
+@* 
                 <!-- Campo do Stripe -->
                 <div id="stripe-fields" class="payment-fields">
                     <div class="form-group">
@@ -57,7 +70,7 @@
                 </div>
 
                 <!-- Campo para MB WAY -->
-                <div id="mbway-fields" class="payment-fields d-none">
+                <div id="mbway-fields" class="payment-fields ">
                     <div class="form-group">
                         <label for="mbway-number"><i class="fas fa-mobile-alt"></i></label>
                         <input type="text" class="form-control" id="mbway-number" name="mbwayNumber" placeholder="Número associado ao MB WAY" />
@@ -65,7 +78,7 @@
                 </div>
 
                 <!-- Campo para Entidade e Referência -->
-                <div id="referencia-fields" class="payment-fields d-none">
+                <div id="referencia-fields" class="payment-fields ">
                     <div class="form-group">
                         <label for="entidade"><i class="fas fa-file-invoice"></i></label>
                         <input type="text" class="form-control" id="entidade" name="entidade" value="12345" readonly />
@@ -79,7 +92,7 @@
                         <input type="text" class="form-control" id="montante" name="montante" value="@Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")" readonly />
                     </div>
                 </div>
-
+ *@
 
                 <button type="submit" class="btn btn-success">Finalizar Pedido</button>
             </form>
@@ -149,83 +162,4 @@
     }
    
 
-    var stripe = Stripe('@stripePublishableKey');
-    var elements = stripe.elements();
-
-    var style = {
-        base: {
-            color: "#32325d",
-            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            fontSmoothing: "antialiased",
-            fontSize: "16px",
-            "::placeholder": {
-                color: "#aab7c4"
-            }
-        },
-        invalid: {
-            color: "#fa755a",
-            iconColor: "#fa755a"
-        }
-    };
-
-    var card = elements.create("card", { style: style });
-    card.mount("#card-element");
-
-    card.on("change", function (event) {
-        var displayError = document.getElementById("card-errors");
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = "";
-        }
-    });
-
-    var form = document.getElementById('payment-form');
-    form.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        stripe.createToken(card).then(function (result) {
-            if (result.error) {
-                // Informar ao usuário se houver um erro
-                var errorElement = document.getElementById('card-errors');
-                errorElement.textContent = result.error.message;
-            } else {
-                // Enviar o token para o servidor
-                var hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'stripeToken');
-                hiddenInput.setAttribute('value', result.token.id);
-                form.appendChild(hiddenInput);
-
-                // Submeter o formulário
-                form.submit();
-            }
-        });
-    });
-    
-</script>
-<!-- JavaScript para alternar entre as opções -->
-<script>
-    function togglePaymentFields() {
-        var selectedMethod = document.getElementById('payment-method').value;
-
-        // Esconder todos os campos primeiro
-        document.getElementById('stripe-fields').classList.add('d-none');
-        document.getElementById('mbway-fields').classList.add('d-none');
-        document.getElementById('referencia-fields').classList.add('d-none');
-
-        // Mostrar os campos relevantes de acordo com a escolha
-        if (selectedMethod === 'stripe') {
-            document.getElementById('stripe-fields').classList.remove('d-none');
-        } else if (selectedMethod === 'mbway') {
-            document.getElementById('mbway-fields').classList.remove('d-none');
-        } else if (selectedMethod === 'referencia') {
-            document.getElementById('referencia-fields').classList.remove('d-none');
-        }
-    }
-
-    // Inicializar os campos visíveis com a opção padrão
-    document.addEventListener("DOMContentLoaded", function () {
-        togglePaymentFields();
-    });
 </script>

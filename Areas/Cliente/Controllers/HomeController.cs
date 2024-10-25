@@ -1,11 +1,15 @@
 using E_Commerce_C__ASP.NET.Data;
 using E_Commerce_C__ASP.NET.Models;
 using E_Commerce_C__ASP.NET.Utility;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace E_Commerce_C__ASP.NET.Areas.Cliente.Controllers
 {
@@ -245,161 +249,201 @@ namespace E_Commerce_C__ASP.NET.Areas.Cliente.Controllers
                 Produto = p,
                 Quantidade = (int)p.Quantidade
             }).ToList();
-
             var pedido = new Pedido
             {
-                ItensPedido = itensPedido,
-                DataPedido = DateTime.Now,
-                NumPedido = Guid.NewGuid().ToString()
+                ItensPedido = itensPedido
             };
 
             // Passa a chave pública do Stripe para a View através do ViewBag
-            ViewBag.StripePublishableKey = _stripeSettings.PublishableKey;
 
             return View(pedido); // Passa o pedido para a View
         }
-
-        [HttpPost]
-        public IActionResult FinalizarPedido(Pedido pedido)
-        {
-            var produtos = HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
-
-            if (produtos == null || !produtos.Any())
-            {
-                TempData["Error"] = "O carrinho está vazio. Adicione produtos antes de finalizar a compra.";
-                return RedirectToAction("Carrinho");
-            }
-
-            pedido.NumPedido = Guid.NewGuid().ToString(); 
-            pedido.DataPedido = DateTime.Now;
-
-            foreach (var produto in produtos)
-            {
-                pedido.ItensPedido.Add(new ItemPedido
-                {
-                    ProdutoId = produto.Id,
-                    Preco = produto.Preco,
-                    Quantidade = (int)produto.Quantidade,
-                    
-                    
-                });
-            }
-
-            _context.DbSet_Pedido.Add(pedido);
-            _context.SaveChanges();
-
-            HttpContext.Session.Remove("produtos");
-
-            return RedirectToAction("Index", "Home");
-        }
-        [HttpPost]
-        public IActionResult ProcessPayment(Pedido pedido, string stripeToken, string paymentMethod, string mbwayNumber = null)
-        {
-            var produtos = HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
-            if (produtos == null || !produtos.Any())
-            {
-                TempData["Error"] = "O pedido está vazio.";
-                return RedirectToAction("Carrinho");
-            }
-            else if (pedido.ItensPedido == null || !pedido.ItensPedido.Any())
-            {
-                pedido.ItensPedido = produtos.Select(produto => new ItemPedido
-                {
-                    ProdutoId = produto.Id,
-                    Preco = produto.Preco,
-                    Quantidade = (int)produto.Quantidade
-                }).ToList();
-            }
-
-            var totalAmount = (long)(pedido.ItensPedido.Sum(item => item.Preco * item.Quantidade) * 100); // Valor em centavos
-
-            // Lógica de acordo com o método de pagamento selecionado
-            switch (paymentMethod)
-            {
-                case "stripe":
-                    if (string.IsNullOrEmpty(stripeToken))
-                    {
-                        TempData["Error"] = "Token de pagamento inválido. Tente novamente.";
-                        return RedirectToAction("Checkout");
-                    }
-
-                    // Pagamento via Stripe
-                    var options = new ChargeCreateOptions
-                    {
-                        Amount = totalAmount,
-                        Currency = "eur",
-                        Description = $"Pedido {pedido.NumPedido}",
-                        Source = stripeToken,
-                    };
-
-                    var service = new ChargeService();
-                    Charge charge = service.Create(options);
-
-                    if (charge.Status == "succeeded")
-                    {
-                        return FinalizarPedidoComSucesso(pedido);
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Falha no processamento do pagamento com cartão.";
-                        return RedirectToAction("Checkout");
-                    }
-
-                case "mbway":
-                    if (string.IsNullOrEmpty(mbwayNumber))
-                    {
-                        TempData["Error"] = "Número MB WAY inválido.";
-                        return RedirectToAction("Checkout");
-                    }
-
-                    // Lógica para processar MB WAY (simulação de fluxo MB WAY)
-                    bool mbwaySuccess = SimularPagamentoMBWay(mbwayNumber, totalAmount);
-
-                    if (mbwaySuccess)
-                    {
-                        return FinalizarPedidoComSucesso(pedido);
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Falha no pagamento via MB WAY.";
-                        return RedirectToAction("Checkout");
-                    }
-
-                case "referencia":
-                    // Pagamento via Referência (gerar entidade e referência fictícia)
-                    TempData["Success"] = "Referência gerada com sucesso. Por favor, finalize o pagamento para completar o pedido.";
-                    return RedirectToAction("ReferenciaGerada", new { pedidoId = pedido.Id });
-
-                default:
-                    TempData["Error"] = "Método de pagamento inválido.";
-                    return RedirectToAction("Checkout");
-            }
-        }
+       
 
 
-        // Método auxiliar para finalizar o pedido com sucesso
-        private IActionResult FinalizarPedidoComSucesso(Pedido pedido)
-        {
-            var ultimoPedido = _context.DbSet_Pedido.OrderByDescending(p => p.Id).FirstOrDefault();
-            int novoNumeroPedido = (ultimoPedido?.NumPedido != null) ? int.Parse(ultimoPedido.NumPedido) + 1 : 1; // Inicia em 1 se não houver pedidos
-            pedido.NumPedido = novoNumeroPedido.ToString();
-            // Salvar o pedido no banco de dados
-            _context.DbSet_Pedido.Add(pedido);
-            _context.SaveChanges();
 
-            // Limpar o carrinho após o pagamento bem-sucedido
-            HttpContext.Session.Remove("produtos");
+        //[HttpPost]
+        //public IActionResult ProcessPayment(Pedido pedido, string stripeToken, string paymentMethod, string mbwayNumber = null)
+        //{
+        //    var produtos = HttpContext.Session.GetObjectFromJson<List<Produto>>("produtos") ?? new List<Produto>();
+        //    if (produtos == null || !produtos.Any())
+        //    {
+        //        TempData["Error"] = "O pedido está vazio.";
+        //        return RedirectToAction("Carrinho");
+        //    }
+        //    else if (pedido.ItensPedido == null || !pedido.ItensPedido.Any())
+        //    {
+        //        pedido.ItensPedido = produtos.Select(produto => new ItemPedido
+        //        {
+        //            ProdutoId = produto.Id,
+        //            Preco = produto.Preco,
+        //            Quantidade = (int)produto.Quantidade
+        //        }).ToList();
+        //    }
 
-            return View("PedidoConfirmado", pedido);
-        }
+        //    var totalAmount = (long)(pedido.ItensPedido.Sum(item => item.Preco * item.Quantidade) * 100); // Valor em centavos
 
-        // Método fictício para simular pagamento MB WAY
-        private bool SimularPagamentoMBWay(string mbwayNumber, long amount)
-        {
-            // Implementar aqui a lógica de comunicação com a API real do MB WAY, caso haja uma
-            // Atualmente, simulação de sucesso
-            return true; // Retornar false para simular falha
-        }
+        //    // Lógica de acordo com o método de pagamento selecionado
+        //    switch (paymentMethod)
+        //    {
+        //        case "stripe":
+        //            if (string.IsNullOrEmpty(stripeToken))
+        //            {
+        //                TempData["Error"] = "Token de pagamento inválido. Tente novamente.";
+        //                return RedirectToAction("Checkout");
+        //            }
+
+        //            // Pagamento via Stripe
+        //            var options = new ChargeCreateOptions
+        //            {
+        //                Amount = totalAmount,
+        //                Currency = "eur",
+        //                Description = $"Pedido {pedido.NumPedido}",
+        //                Source = stripeToken,
+        //            };
+
+        //            var service = new ChargeService();
+        //            Charge charge = service.Create(options);
+
+        //            if (charge.Status == "succeeded")
+        //            {
+        //                return FinalizarPedidoComSucesso(pedido);
+        //            }
+        //            else
+        //            {
+        //                TempData["Error"] = "Falha no processamento do pagamento com cartão.";
+        //                return RedirectToAction("Checkout");
+        //            }
+
+        //        case "mbway":
+        //            if (string.IsNullOrEmpty(mbwayNumber))
+        //            {
+        //                TempData["Error"] = "Número MB WAY inválido.";
+        //                return RedirectToAction("Checkout");
+
+
+        //            }
+
+        //            // Lógica para processar MB WAY (simulação de fluxo MB WAY)
+        //            bool mbwaySuccess = SimularPagamentoMBWay(mbwayNumber, totalAmount);
+
+        //            if (mbwaySuccess)
+        //            {
+        //                return FinalizarPedido(pedido);
+        //            }
+        //            else
+        //            {
+        //                TempData["Error"] = "Falha no pagamento via MB WAY.";
+        //                return RedirectToAction("Checkout");
+        //            }
+
+        //        case "referencia":
+        //            // Pagamento via Referência (gerar entidade e referência fictícia)
+        //            TempData["Success"] = "Referência gerada com sucesso. Por favor, finalize o pagamento para completar o pedido.";
+        //            return RedirectToAction("ReferenciaGerada", new { pedidoId = pedido.Id });
+
+        //        default:
+        //            TempData["Error"] = "Método de pagamento inválido.";
+        //            return RedirectToAction("Checkout");
+        //    }
+        //}
+
+
+        //// Método auxiliar para finalizar o pedido com sucesso
+        //private IActionResult FinalizarPedidoComSucesso(Pedido pedido)
+        //{
+        //    // Verificar se o pedido tem itens
+        //    if (pedido.ItensPedido == null || !pedido.ItensPedido.Any())
+        //    {
+        //        TempData["Error"] = "Não foi possível finalizar o pedido porque não há itens.";
+        //        return RedirectToAction("Carrinho");
+        //    }
+
+        //    // Calcular o número do pedido
+        //    var ultimoPedido = _context.DbSet_Pedido.OrderByDescending(p => p.Id).FirstOrDefault();
+        //    int novoNumeroPedido = (ultimoPedido?.NumPedido != null) ? int.Parse(ultimoPedido.NumPedido) + 1 : 1;
+        //    pedido.NumPedido = novoNumeroPedido.ToString();
+        //    pedido.DataPedido = DateTime.Now;
+        //    // Calcular total do pedido e a quantidade total de itens
+        //    pedido.PrecoFinal = pedido.ItensPedido.Sum(item => item.Preco * item.Quantidade);
+        //    pedido.QuantItens = pedido.ItensPedido.Sum(item => item.Quantidade);
+        //    pedido.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    // Verificar se todos os valores estão corretos
+        //    if (pedido.PrecoFinal == 0 || pedido.QuantItens == 0)
+        //    {
+        //        TempData["Error"] = "Erro ao finalizar o pedido. Verifique os itens no carrinho.";
+        //        return RedirectToAction("Carrinho");
+        //    }
+        //    pedido.Status = "Pagamento efetuado com sucesso, a preparar a encomenda!";
+        //    // Salvar o pedido no banco de dados
+        //    _context.DbSet_Pedido.Add(pedido);
+        //    _context.SaveChanges();
+        //    GerarFatura(pedido);
+
+        //    // Limpar o carrinho após o pagamento bem-sucedido
+        //    HttpContext.Session.Remove("produtos");
+
+        //    // Retornar a View de confirmação de pedido com os dados do pedido
+        //    return RedirectToAction("PedidoSucesso", "PedidosCliente", new { id = pedido.Id });
+        //}
+
+
+        //// Método fictício para simular pagamento MB WAY
+        //private bool SimularPagamentoMBWay(string mbwayNumber, long amount)
+        //{
+        //    // Implementar aqui a lógica de comunicação com a API real do MB WAY, caso haja uma
+        //    // Atualmente, simulação de sucesso
+        //    return true; // Retornar false para simular falha
+        //}
+        //private IActionResult GerarFatura(Pedido pedido)
+        //{
+        //    // Carrega o pedido com os produtos associados aos itens do pedido
+        //    pedido = _context.DbSet_Pedido
+        //                     .Include(p => p.ItensPedido)
+        //                     .ThenInclude(i => i.Produto)  // Inclui os detalhes do Produto
+        //                     .FirstOrDefault(p => p.Id == pedido.Id);
+
+        //    // Define o caminho onde o PDF será salvo
+        //    var caminhoPdf = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Faturas", $"{pedido.NumPedido}_{pedido.Id}_{pedido.UserId}.pdf");
+
+        //    using (var writer = new PdfWriter(caminhoPdf))
+        //    {
+        //        using (var pdf = new PdfDocument(writer))
+        //        {
+        //            var document = new Document(pdf);
+
+        //            // Adicionando título
+        //            document.Add(new Paragraph($"Detalhes do Pedido {pedido.NumPedido}").SetFontSize(20).SetBold());
+
+        //            // Adicionando detalhes do cliente
+        //            document.Add(new Paragraph($"Nome: {pedido.Nome}"));
+        //            document.Add(new Paragraph($"Email: {pedido.Email}"));
+        //            document.Add(new Paragraph($"Morada: {pedido.Morada}"));
+        //            document.Add(new Paragraph($"Código Postal: {pedido.codigoPost}"));
+        //            document.Add(new Paragraph($"Localidade: {pedido.Localidade}"));
+        //            document.Add(new Paragraph($"Data do Pedido: {pedido.DataPedido.ToString("dd/MM/yyyy")}"));
+
+        //            // Adicionando detalhes dos itens do pedido
+        //            document.Add(new Paragraph("Itens do Pedido:").SetFontSize(16).SetBold());
+        //            foreach (var item in pedido.ItensPedido)
+        //            {
+        //                // Adiciona as informações do produto ao PDF
+        //                document.Add(new Paragraph($"- Produto: {item.Produto.Nome}, Quantidade: {item.Quantidade}, Preço: {item.Preco} €"));
+        //            }
+
+        //            // Adicionando total
+        //            var total = pedido.ItensPedido.Sum(i => i.Preco * i.Quantidade);
+        //            document.Add(new Paragraph($"Total: {total} €").SetBold().SetFontSize(16));
+
+        //            // Fechar o documento
+        //            document.Close();
+        //        }
+        //    }
+
+        //    // Retornar o PDF gerado para download
+        //    var fileStream = new FileStream(caminhoPdf, FileMode.Open);
+        //    return File(fileStream, "application/pdf", $"{pedido.NumPedido}.pdf");
+        //}
 
 
 

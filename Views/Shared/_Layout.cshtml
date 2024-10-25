@@ -15,9 +15,8 @@
     <title>@ViewData["Title"] - E_Commerce_C__ASP.NET</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/E_Commerce_C__ASP.NET.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.min.css" />
 </head>
 <body>
     <header>
@@ -44,9 +43,13 @@
                                 <i class="fas fa-shopping-cart"></i>
                                 Carrinho (<span id="cartCount">@cont</span>)
                             </a>
-                            
-                            
                         </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Cliente" asp-controller="PedidosCliente" asp-action="Index">Meus Pedidos</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
@@ -55,29 +58,30 @@
                 </div>
             </div>
         </nav>
+       
     </header>
 
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-
         <partial name="_CarrinhoPartial" />
-
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - E_Commerce_C__ASP.NET - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer class="fixed-footer">
+                
+
+                  
     </footer>
+
 
     <script src="https://kit.fontawesome.com/24c6fc2399.js" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
     
+  
+   
 </body>
 </html>

@@ -1,27 +1,28 @@
+/* Estilos gerais */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
-
+/* Estilos do carrinho */
 .cart-container {
     position: fixed;
     bottom: 20px; /* Distância do fundo do browser */
@@ -61,5 +62,63 @@ body {
 
 .cart-container button {
     margin-right: 1px; /* Espaçamento entre os botões */
-    justify-content:left
+    justify-content: left;
 }
+
+.dropdown-content {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    position: absolute; /* ou relative dependendo do layout */
+    z-index: 1;
+    width: 250px; /* ajuste conforme necessário */
+}
+
+/* Estilos do cartão flip */
+.card-container {
+    perspective: 1000px; /* Para dar um efeito 3D */
+    margin-bottom: 20px; /* Espaçamento entre os cartões */
+}
+
+.card {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Ajuste a altura conforme necessário */
+    transform-style: preserve-3d; /* Permite o efeito 3D */
+    transition: transform 0.6s; /* Animação suave */
+}
+
+.card-flip {
+    transform: rotateY(180deg); /* Rotaciona o cartão para mostrar o verso */
+}
+
+.card-front, .card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backface-visibility: hidden; /* Esconde a parte de trás quando virada */
+}
+
+.card-back {
+    transform: rotateY(180deg); /* Parte de trás inicialmente virada */
+    background-color: #f8f9fa; /* Cor de fundo da parte de trás */
+    display: flex; /* Flexbox para alinhar o conteúdo */
+    flex-direction: column; /* Organiza o conteúdo verticalmente */
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    padding: 20px; /* Espaçamento interno */
+}
+
+.card-header {
+    background-color: #f8f9fa; /* Cor de fundo do cabeçalho do cartão */
+    color: white; /* Cor do texto */
+    padding: 10px; /* Espaçamento interno do cabeçalho */
+    border-radius: 5px 5px 0 0; /* Cantos arredondados apenas no topo */
+}
+
+.card-img-top {
+    border-radius: 5px 5px 0 0; /* Cantos arredondados na imagem do cartão */
+}
+

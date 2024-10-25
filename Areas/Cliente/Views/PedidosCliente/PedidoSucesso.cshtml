@@ -1,0 +1,43 @@
+﻿@model E_Commerce_C__ASP.NET.Models.Pedido
+
+@{
+    ViewBag.Title = "Finalizar Pedido";
+}
+
+<h2>Pedido Confirmado!</h2>
+
+<p>Obrigado pela sua compra. Aqui estão os detalhes do seu pedido:</p>
+<p>Status: @Model.Status.ToString()</p>
+<div>
+    <h3>Pedido Número: @Model.NumPedido</h3>
+    <p><strong>Data do Pedido:</strong> @Model.DataPedido.ToString("dd/MM/yyyy")</p>
+    <p><strong>Total:</strong> @Model.PrecoFinal €</p>
+</div>
+
+<h4>Itens do Pedido:</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário (€)</th>
+            <th>Subtotal (€)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ItensPedido)
+        {
+            <tr>
+                <td>@item.Produto.Nome</td>
+                <td>@item.Quantidade</td>
+                <td>@item.Preco.ToString("F2")</td>
+                <td>@(item.Preco * item.Quantidade)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><strong>Total do Pedido:</strong> @Model.PrecoFinal €</p>
+
+<a href="@Url.Action("Index", "Home")" class="btn btn-primary">Voltar à Página Inicial</a>
+<a href="@Url.Action("Index", "PedidosCliente")" class="btn btn-secondary">Ver Meus Pedidos</a>

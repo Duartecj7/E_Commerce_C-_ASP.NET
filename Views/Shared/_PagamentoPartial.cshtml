@@ -1,0 +1,49 @@
+﻿@model E_Commerce_C__ASP.NET.Models.Pedido
+
+<form asp-action="PagarPedido" method="post">
+    <input type="hidden" asp-for="NumPedido" />
+    <input type="hidden" asp-for="PrecoFinal" />
+
+    <div class="form-group">
+        <label asp-for="Nome"></label>
+        <input asp-for="Nome" class="form-control" required />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NumTel"></label>
+        <input asp-for="NumTel" class="form-control" required />
+        <span asp-validation-for="NumTel" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" required type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Morada"></label>
+        <input asp-for="Morada" class="form-control" required />
+        <span asp-validation-for="Morada" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CodigoPost"></label>
+        <input asp-for="CodigoPost" class="form-control" required />
+        <span asp-validation-for="CodigoPost" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Localidade"></label>
+        <input asp-for="Localidade" class="form-control" required />
+        <span asp-validation-for="Localidade" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Tipo de Pagamento</label>
+        <select asp-for="TipoPagamento" class="form-control" required>
+            <option value="">Selecione...</option>
+            <option value="Cartão de Crédito">Cartão de Crédito</option>
+            <option value="Transferência Bancária">Transferência Bancária</option>
+            <option value="PayPal">PayPal</option>
+        </select>
+        <span asp-validation-for="TipoPagamento" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Finalizar Pagamento</button>
+</form>
