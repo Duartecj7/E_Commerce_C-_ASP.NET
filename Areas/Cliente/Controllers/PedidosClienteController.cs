@@ -212,6 +212,7 @@ namespace E_Commerce_C__ASP.NET.Areas.Cliente.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult PagarPedido(Pedido pedido)
+        private IActionResult FinalizarPedidoComSucesso(Pedido pedido)
         {
             // Aqui você pode tratar o pedido com as informações que foram submetidas
             // Exemplo: salvar os dados de pagamento, atualizar o status do pedido, etc.
