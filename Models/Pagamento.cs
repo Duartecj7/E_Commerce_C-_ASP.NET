@@ -3,7 +3,7 @@
     public class Pagamento
     {
         public int Id { get; set; } 
-        public string ModoPagamento { get; set; } // Ex: "Cartão", "MBWAY", "Referência"
+        public string ModoPagamento { get; set; } // Ex: "stripe", "referencia", "mbway"
         public string TokenPagamento { get; set; } 
         public string ReferenciaPagamento { get; set; } 
         public string Status { get; set; } = "Pagamento Pendente"; 

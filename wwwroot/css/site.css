@@ -21,6 +21,89 @@ html {
 body {
     margin-bottom: 60px;
 }
+/*Sticker Morada encomenda*/
+.sticker-card {
+    max-width: 300px;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: #fef9c3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 20px;
+    position: relative;
+    border: 1px dashed #ffce00;
+}
+/* Pagamento referencia */
+.payment-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    width: 300px; /* Defina a largura do cartão */
+}
+
+    .payment-card h4 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+.payment-detail {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+    .detail-row label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .detail-row p {
+        margin: 0;
+        color: #333;
+        text-align: right;
+    }
+
+
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+    /* Efeito de "sticker" com borda inclinada */
+    .sticker-card::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 30px;
+        height: 30px;
+        background: #ffce00;
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+
+    .sticker-card h4 {
+        font-size: 1.2rem;
+        margin: 0;
+        color: #d97706;
+    }
+
+    .sticker-card p {
+        margin: 0.5rem 0;
+        line-height: 1.4;
+    }
+
+    .sticker-card .icon {
+        font-size: 2rem;
+        color: #d97706;
+        margin-bottom: 0.5rem;
+    }
+
 
 /* Estilos do carrinho */
 .cart-container {

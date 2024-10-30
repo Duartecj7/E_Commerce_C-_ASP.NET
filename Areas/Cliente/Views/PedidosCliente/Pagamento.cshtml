@@ -1,0 +1,193 @@
+﻿@model Pedido
+
+@{
+    ViewData["Title"] = "Pagamento";
+    var stripePublishableKey = ViewBag.StripePublishableKey as string;
+}
+<div class="container mt-4">
+    <!-- Título do tipo de pagamento -->
+    <div class="row">
+        <div class="col-12">
+            @switch (@Model.TipoPagamento)
+            {
+                case "stripe":
+                    <h1>Modalidade de pagamento:<b>Cartão de crédito</b></h1>
+                    break;
+                case "mbway":
+                    <h1>Modalidade de pagamento:<b>MB Way</b></h1>
+                    break;
+                case "referencia":
+                    <h1>Modalidade de pagamento:<b>Referência Multibanco</b></h1>
+                    break;
+            }
+            <br />
+        </div>
+    </div>
+
+    <!-- Layout principal dividido em duas colunas -->
+    <div class="row">
+        <!-- Lista de produtos no lado esquerdo -->
+        <div class="col-md-8">
+            <h2>
+                Produtos do Pedido(<b>Total: @Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")</b>)
+            </h2>
+            @if (Model.ItensPedido != null && Model.ItensPedido.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                            <th>Tipo de produto</th>
+                            <th>Cor</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ItensPedido)
+                        {
+                            var produto = item.Produto;
+                            if (produto != null)
+                            {
+                                <tr>
+                                    <td><img src="~/@produto.Imagem" width="100px" height="75px" /></td>
+                                    <td>@produto.Nome</td>
+                                    <td>@item.Preco.ToString("C")</td>
+                                    <td>@produto.Tag.TagNome</td>
+                                    <td>@produto.Cor</td>
+                                    <td>@item.Quantidade</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Nenhum produto no pedido.</p>
+            }
+        </div>
+
+        <!-- Cartão de morada e formulário de pagamento no lado direito -->
+        <div class="col-md-4">
+            <div class="sticker-card">
+                <div class="icon">📍 Endereço</div>
+                <p>@Model.Nome</p>
+                <p>@Model.Morada</p>
+                <p>@Model.CodigoPost @Model.Localidade</p>
+            </div>
+            <div class="payment-card" style="padding: 20px; border: 1px solid #ccc; border-radius: 8px; height: auto; width: auto; overflow: auto;">
+                <h4 class="text-center">
+                    Detalhes do Pagamento
+                    @switch (@Model.TipoPagamento)
+                    {
+                        case "stripe":
+                            <img src="~/Imagens/cartao.png" style="height:50px;width:50px">
+                            break;
+                        case "mbway":
+                            <img src="~/Imagens/mbway-logo.png" style="height:30px;width:45px">
+                            break;
+                        case "referencia":
+                            <img src="~/Imagens/1200px-Multibanco.png" style="height:30px;width:30px">
+                            break;
+                    }
+                </h4>
+
+                @switch (@Model.TipoPagamento)
+                {
+                    case "stripe":
+                        <div>
+                            <form id="payment-form" method="post" asp-action="PagarPedido" asp-controller="PedidosCliente">
+                                <input type="hidden" name="Id" value="@Model.Id" />
+                                <input type="hidden" name="mbwayNumber" value="@Model.NumTel" />
+                                <br />
+                                <div class="form-group">
+                                    <div id="card-element"></div>
+                                    <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">Pagar Agora</button>
+                            </form>
+                        </div>
+                        break;
+                    case "mbway":
+                        <div>
+                            <form id="payment-form" method="post" asp-action="PagarPedido" asp-controller="PedidosCliente">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="mbwayNumber" name="mbwayNumber" placeholder="Número associado ao MB WAY" />
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">Pagar Agora</button>
+                            </form>
+                        </div>
+                        break;
+                    case "referencia":
+                        <div>
+                            <div class="payment-detail">
+                                <div class="detail-row">
+                                    <label>Entidade:</label>
+                                    <p>12345</p>
+                                </div>
+                                <div class="detail-row">
+                                    <label> Referência:</label>
+                                    <p>667 778 889</p>
+                                </div>
+                                <div class="detail-row">
+                                    <label>Montante:</label>
+                                    <p>@Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Pagar Agora</button>
+                            </div>
+                        </div>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var stripe = Stripe('@stripePublishableKey');
+            var elements = stripe.elements();
+
+            var style = {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    '::placeholder': { color: '#aab7c4' }
+                },
+                invalid: { color: '#fa755a' }
+            };
+
+            var card = elements.create('card', { style: style });
+            card.mount('#card-element');
+
+            card.on('change', function (event) {
+                document.getElementById('card-errors').textContent = event.error ? event.error.message : '';
+            });
+
+            var form = document.getElementById('payment-form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                stripe.createToken(card).then(function (result) {
+                    if (result.error) {
+                        document.getElementById('card-errors').textContent = result.error.message;
+                    } else {
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.setAttribute('type', 'hidden');
+                        hiddenInput.setAttribute('name', 'stripeToken');
+                        hiddenInput.setAttribute('value', result.token.id);
+                        form.appendChild(hiddenInput);
+
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

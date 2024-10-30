@@ -20,6 +20,7 @@
                     foreach (var item in Model.ItensPedido)
                     {
                         <input type="hidden" name="items[@index].ProdutoId" value="@item.ProdutoId" />
+                        <input type="hidden" name="items[@index].ProdutoId" value="@item.Produto" />
                         <input type="hidden" name="items[@index].Preco" value="@item.Preco" />
                         <input type="hidden" name="items[@index].Quantidade" value="@item.Quantidade" />
                         index++;
@@ -51,49 +52,14 @@
                 </div>
                 <div class="form-group">
                     <label for="payment-method">Escolha o método de pagamento</label>
-                    <select class="form-control" id="payment-method" name="TipoPagamento" onchange="togglePaymentFields()">
+                    <select class="form-control" id="payment-method" name="TipoPagamento" onchange="switchPaymentFields()">
                         <option value="stripe">Cartão de Crédito</option>
-                        <option value="mbway">MB WAY</option>
-                        <option value="referencia">Entidade e Referência</option>
+                       @*  <option value="mbway">MB WAY</option>
+                        <option value="referencia">Entidade e Referência</option> *@
                     </select>
                 </div>
-@* 
-                <!-- Campo do Stripe -->
-                <div id="stripe-fields" class="payment-fields">
-                    <div class="form-group">
-                        <label for="card-element"><i class="fas fa-credit-card"></i></label>
-                        <div id="card-element">
-                            <!-- Elemento do Stripe será inserido aqui -->
-                        </div>
-                        <div id="card-errors" role="alert"></div>
-                    </div>
-                </div>
 
-                <!-- Campo para MB WAY -->
-                <div id="mbway-fields" class="payment-fields ">
-                    <div class="form-group">
-                        <label for="mbway-number"><i class="fas fa-mobile-alt"></i></label>
-                        <input type="text" class="form-control" id="mbway-number" name="mbwayNumber" placeholder="Número associado ao MB WAY" />
-                    </div>
-                </div>
-
-                <!-- Campo para Entidade e Referência -->
-                <div id="referencia-fields" class="payment-fields ">
-                    <div class="form-group">
-                        <label for="entidade"><i class="fas fa-file-invoice"></i></label>
-                        <input type="text" class="form-control" id="entidade" name="entidade" value="12345" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label for="referencia">Referência</label>
-                        <input type="text" class="form-control" id="referencia" name="referencia" value="667 778 889" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label for="montante">Montante</label>
-                        <input type="text" class="form-control" id="montante" name="montante" value="@Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")" readonly />
-                    </div>
-                </div>
- *@
-
+               
                 <button type="submit" class="btn btn-success">Finalizar Pedido</button>
             </form>
         </div>
@@ -145,21 +111,3 @@
     </div>
 </div>
 
-<!-- Incluir o JavaScript do Stripe -->
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-    function formatCodigoPostal(input) {
-        // Remove todos os caracteres que não são números
-        let value = input.value.replace(/\D/g, '');
-
-        // Adiciona o hífen após os primeiros 4 números
-        if (value.length > 4) {
-            value = value.slice(0, 4) + '-' + value.slice(4, 7);
-        }
-
-        // Limita a entrada a 8 caracteres (4+1+3)
-        input.value = value.slice(0, 8);
-    }
-   
-
-</script>

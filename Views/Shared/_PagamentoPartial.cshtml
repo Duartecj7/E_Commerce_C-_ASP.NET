@@ -1,49 +1,209 @@
 ﻿@model E_Commerce_C__ASP.NET.Models.Pedido
+@{
+    var stripePublishableKey = ViewBag.StripePublishableKey as string;
+}
 
-<form asp-action="PagarPedido" method="post">
-    <input type="hidden" asp-for="NumPedido" />
-    <input type="hidden" asp-for="PrecoFinal" />
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Dados do Cliente</h3>
+            <form asp-action="ProcessPayment" method="post" id="payment-form">
+                <input type="hidden" asp-for="NumPedido" />
+                <input type="hidden" asp-for="ItensPedido" />
+                <input type="hidden" asp-for="PrecoFinal" />
+                <input type="hidden" asp-for="Nome" />
+                <input type="hidden" asp-for="NumTel" />
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="Morada" />
+                <input type="hidden" asp-for="CodigoPost" />
+                <input type="hidden" asp-for="Localidade" />
 
-    <div class="form-group">
-        <label asp-for="Nome"></label>
-        <input asp-for="Nome" class="form-control" required />
-        <span asp-validation-for="Nome" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="NumTel"></label>
-        <input asp-for="NumTel" class="form-control" required />
-        <span asp-validation-for="NumTel" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" required type="email" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Morada"></label>
-        <input asp-for="Morada" class="form-control" required />
-        <span asp-validation-for="Morada" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="CodigoPost"></label>
-        <input asp-for="CodigoPost" class="form-control" required />
-        <span asp-validation-for="CodigoPost" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Localidade"></label>
-        <input asp-for="Localidade" class="form-control" required />
-        <span asp-validation-for="Localidade" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Tipo de Pagamento</label>
-        <select asp-for="TipoPagamento" class="form-control" required>
-            <option value="">Selecione...</option>
-            <option value="Cartão de Crédito">Cartão de Crédito</option>
-            <option value="Transferência Bancária">Transferência Bancária</option>
-            <option value="PayPal">PayPal</option>
-        </select>
-        <span asp-validation-for="TipoPagamento" class="text-danger"></span>
-    </div>
+                <!-- Campos do cliente -->
+                <h4>Dados de entrega:</h4>
+                <h5>@Model.Nome</h5>
+                <h5>@Model.Morada</h5>
+                <h5>@Model.CodigoPost - @Model.Localidade</h5>
+                <!-- Produtos do Pedido -->
+                <div class="col-md-12">
+                    <h3>Produtos Pedidos:</h3>
+                    <ul class="list-group">
+                        @if (Model.ItensPedido != null && Model.ItensPedido.Any())
+                        {
+                            foreach (var item in Model.ItensPedido)
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <img src="@Url.Content("~/"+item.Produto.Imagem)" alt="Imagem do Produto" style="width: 50px; height: 50px; margin-right: 15px;" />
+                                    <div>
+                                        <h6>@item.Produto.Nome : @item.Preco € x @item.Quantidade = @(item.Preco * item.Quantidade) €</h6>
+                                    </div>
+                                </li>
+                            }
+                            <p>Total: @Model.PrecoFinal €</p>
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Nenhum produto encontrado.</li>
+                        }
+                    </ul>
+                </div>
+        
+    
+              
+                
+                <div class="form-group">
+                    <label>Tipo de Pagamento</label>
+                    <select asp-for="TipoPagamento" class="form-control" required id="TipoPagamento">
+                        <option value="stripe">Cartão de Crédito</option>
+                        <option value="transferencia">Transferência Bancária</option>
+                        <option value="referencia">Referência MB</option>
+                    </select>
+                    <span asp-validation-for="TipoPagamento" class="text-danger"></span>
+                </div>
+                <!-- Campo do Stripe -->
+                <div id="stripe-fields" class="payment-fields">
+                    <div class="form-group">
+                        <label for="card-element"><i class="fas fa-credit-card"></i></label>
+                        <div id="card-element">
+                            <!-- Elemento do Stripe será inserido aqui -->
+                        </div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                </div>
 
-    <button type="submit" class="btn btn-primary">Finalizar Pagamento</button>
-</form>
+                <!-- Campo para MB WAY -->
+                <div id="mbway-fields" class="payment-fields ">
+                    <div class="form-group">
+                        <label for="mbway-number"><i class="fas fa-mobile-alt"></i></label>
+                        <input type="text" class="form-control" id="mbway-number" name="mbwayNumber" placeholder="Número associado ao MB WAY" />
+                    </div>
+                </div>
+
+                <!-- Campo para Entidade e Referência -->
+                <div id="referencia-fields" class="payment-fields ">
+                    <div class="form-group">
+                        <label for="entidade"><i class="fas fa-file-invoice"></i></label>
+                        <input type="text" class="form-control" id="entidade" name="entidade" value="12345" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="referencia">Referência</label>
+                        <input type="text" class="form-control" id="referencia" name="referencia" value="667 778 889" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="montante">Montante</label>
+                        <input type="text" class="form-control" id="montante" name="montante" value="@Model.ItensPedido.Sum(item => item.Preco * item.Quantidade).ToString("C")" readonly />
+                    </div>
+                </div>
+
+
+               
+
+                <button type="submit" class="btn btn-primary mt-3">Finalizar Pagamento</button>
+            </form>
+        </div>
+</div>
+       
+@section Scripts{
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            var stripePublicKey = '@ViewData["StripePublicKey"]';
+            var stripe = Stripe(stripePublicKey);
+            var elements = stripe.elements();
+            var card = elements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#32325d',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#fa755a'
+                    }
+                }
+            });
+
+            // Inicializa o elemento do cartão
+            function initializeStripeElement() {
+                card.mount('#card-element');
+                card.on('change', function (event) {
+                    var displayError = document.getElementById('card-errors');
+                    displayError.textContent = event.error ? event.error.message : '';
+                });
+            }
+
+            // Função para alternar os campos de pagamento
+            function togglePaymentFields() {
+                var paymentMethod = document.getElementById('payment-method').value;
+                document.getElementById('stripe-fields').style.display = paymentMethod === 'stripe' ? 'block' : 'none';
+                document.getElementById('mbway-fields').style.display = paymentMethod === 'mbway' ? 'block' : 'none';
+                document.getElementById('referencia-fields').style.display = paymentMethod === 'referencia' ? 'block' : 'none';
+
+                if (paymentMethod === 'stripe') {
+                    initializeStripeElement();
+                }
+            }
+
+            // Inicializa a exibição com base no método de pagamento selecionado
+            document.getElementById('payment-method').addEventListener('change', togglePaymentFields);
+            togglePaymentFields(); // Chama na inicialização para exibir o campo correto
+
+            // Exemplo de envio do formulário com o token do Stripe
+            var form = document.querySelector('form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                if (document.getElementById('payment-method').value === 'stripe') {
+                    stripe.createToken(card).then(function (result) {
+                        if (result.error) {
+                            var errorElement = document.getElementById('card-errors');
+                            errorElement.textContent = result.error.message;
+                        } else {
+                            var hiddenInput = document.createElement('input');
+                            hiddenInput.setAttribute('type', 'hidden');
+                            hiddenInput.setAttribute('name', 'stripeToken');
+                            hiddenInput.setAttribute('value', result.token.id);
+                            form.appendChild(hiddenInput);
+                            form.submit();
+                        }
+                    });
+                } else {
+                    form.submit();
+                }
+            });
+            function switchPaymentFields() {
+                // Obtém o valor selecionado no campo de seleção
+                const paymentMethod = document.getElementById('payment-method').value;
+
+                // Referências para os campos de pagamento
+                const stripeFields = document.getElementById('stripe-fields');
+                const mbwayFields = document.getElementById('mbway-fields');
+                const referenciaFields = document.getElementById('referencia-fields');
+
+                // Reseta a visibilidade de todos os campos de pagamento para "none"
+                stripeFields.style.display = 'none';
+                mbwayFields.style.display = 'none';
+                referenciaFields.style.display = 'none';
+
+                // Mostra apenas o campo correspondente ao método de pagamento selecionado
+                switch (paymentMethod) {
+                    case 'stripe':
+                        stripeFields.style.display = 'block';
+                        break;
+                    case 'mbway':
+                        mbwayFields.style.display = 'block';
+                        break;
+                    case 'referencia':
+                        referenciaFields.style.display = 'block';
+                        break;
+                    default:
+                        // Caso deseje adicionar um comportamento padrão, faça isso aqui
+                        break;
+                }
+            }
+            document.addEventListener("DOMContentLoaded", function () {
+                switchPaymentFields();
+            });
+        </script>
+
+}

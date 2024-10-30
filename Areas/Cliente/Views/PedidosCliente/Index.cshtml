@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Meus Pedidos";
 }
+
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success">
@@ -70,38 +71,73 @@ else
                         </a>
                         <form action="@Url.Action("EliminarPedido", "PedidosCliente", new { numPedido = pedido.Id })" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger" title="Eliminar Pedido" onclick="return confirm('Tem certeza que deseja eliminar este pedido?');">
-                                <i class="fas fa-trash"></i> 
+                                <i class="fas fa-trash"></i>
                             </button>
                         </form>
                         <a href="@Url.Action("EditarPedido", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-warning" title="Atualizar"><i class="fas fa-edit"></i> </a>
-                        <a href="@Url.Action("FaturaPedido", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-sucess" title="Fatura"> <i class="fas fa-file-download"></i></a>
-                        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#paymentModal"
-                           onclick="loadPaymentPartial('@pedido.Id')">
+                        <a asp-action="GerarFatura" asp-controller="PedidosCliente" asp-area="Cliente" asp-route-id="@pedido.Id" class="btn btn-success" title="Fatura"> <i class="fas fa-file-download"></i></a>
+                        <a href="@Url.Action("Pagamento", "PedidosCliente", new { id = pedido.Id })" class="btn btn-success" title="Pagar">
+                            <i class="fas fa-money-bill-wave"></i> 
+                        </a>                       @*  <a href="@Url.Action("Checkout", "PedidosCliente", new { numPedido = pedido.Id })" class="btn btn-success" title="Pagar">
                             <i class="fas fa-money-bill-wave"></i> Pagar
-                        </a>
+                        </a> *@                        
+                        @* <a href="#" class="btn btn-success" data-toggle="modal" data-target="#paymentModal" onclick="loadPaymentPartial('@pedido.Id')">
+                            <i class="fas fa-money-bill-wave"></i> Pagar
+                        </a> *@
                     </td>
                 </tr>
             }
-            <!-- Modal -->
-            <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="paymentModalLabel">Pagamento</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- O conteúdo da partial view será carregado aqui -->
-                        </div>
-                    </div>
-                </div>
-            </div>
         </tbody>
     </table>
-    @section Scripts {
+
+    <!-- Modal de Pagamento -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Pagamento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- O conteúdo da partial view será carregado aqui -->
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+}
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/">
+         document.getElementById('TipoPagamento').addEventListener('change', function () {
+            var stripeFields = document.getElementById('stripe-fields');
+            if (this.value === 'stripe') {
+                stripeFields.style.display = 'block';
+
+                // Inicialização do Stripe
+                var stripe = Stripe(); // Substitua pela sua chave pública do Stripe
+                var elements = stripe.elements();
+
+                // Criar os elementos para os campos do cartão
+                var cardNumber = elements.create('cardNumber', { style: { base: { fontSize: '16px' } } });
+                cardNumber.mount('#cardNumber');
+
+                var cardExpiry = elements.create('cardExpiry', { style: { base: { fontSize: '16px' } } });
+                cardExpiry.mount('#cardExpiry');
+
+                var cardCvc = elements.create('cardCvc', { style: { base: { fontSize: '16px' } } });
+                cardCvc.mount('#cardCvc');
+            } else {
+                stripeFields.style.display = 'none';
+            }
+        });
+    </script>
+
     <script>
+
         var currentOpenDropdown = null;  // Variável global para controlar o dropdown atual
 
         // Alterna entre mostrar/ocultar o dropdown e altera o ícone
@@ -158,7 +194,5 @@ else
                 }
             });
         }
-
     </script>
-}
 }

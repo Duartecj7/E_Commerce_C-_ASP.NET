@@ -63,7 +63,7 @@ else
             <div class="col-md-12">
                 <h4>Total: @Model.Sum(item => item.Preco * item.Quantidade).ToString()</h4>
                 <a asp-action="EmptyCart" asp-controller="Home" class="btn btn-warning">Esvaziar Carrinho</a>
-                <a asp-action="Checkout" asp-controller="Home" class="btn btn-success">Checkout</a>
+                <a asp-action="Checkout" asp-controller="PedidosCliente" asp-area="Cliente" class="btn btn-success">Checkout</a>
             </div>
         </div>
     </div>
